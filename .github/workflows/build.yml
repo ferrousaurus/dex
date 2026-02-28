@@ -1,0 +1,26 @@
+name: Build
+
+on:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.6.10"
+
+      - name: Generate Prisma client
+        run: deno task build:prisma
+
+      - name: Check formatting, linting, and types
+        run: deno task check
+
+      - name: Build app
+        run: deno task app

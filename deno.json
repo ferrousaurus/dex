@@ -1,0 +1,101 @@
+{
+  "tasks": {
+    "check": "deno fmt --check . && deno lint . && deno check",
+    "test": "deno test --allow-read src/",
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "deno -A ./.output/server/index.mjs",
+    "build:prisma": "deno run --env-file --env-file=.env.local -A prisma generate",
+    "start:prisma": "deno run --env-file --env-file=.env.local -A prisma studio",
+    "push:prisma": "deno run --env-file --env-file=.env.local -A prisma db push",
+    "seed:prisma": "deno run -A ./prisma/seed.ts"
+  },
+  "fmt": {
+    "exclude": [
+      "./src/routeTree.gen.ts",
+      "./prisma/generated/"
+    ]
+  },
+  "lint": {
+    "exclude": [
+      "./src/routeTree.gen.ts",
+      "./prisma/generated/"
+    ],
+    "rules": {
+      "tags": [
+        "recommended",
+        "react",
+        "jsx"
+      ]
+    }
+  },
+  "nodeModulesDir": "auto",
+  "imports": {
+    "@deno/vite-plugin": "npm:@deno/vite-plugin@^1.0.6",
+    "@mantine/core": "npm:@mantine/core@^8.3.15",
+    "@mantine/hooks": "npm:@mantine/hooks@^8.3.15",
+    "@mantine/modals": "npm:@mantine/modals@^8.3.15",
+    "@mantine/notifications": "npm:@mantine/notifications@^8.3.15",
+    "@std/assert": "jsr:@std/assert@^1.0.19",
+    "@std/dotenv": "jsr:@std/dotenv@^0.225.6",
+    "@tanstack/devtools-vite": "npm:@tanstack/devtools-vite@^0.5.1",
+    "@tanstack/react-devtools": "npm:@tanstack/react-devtools@^0.9.6",
+    "@tanstack/react-form-devtools": "npm:@tanstack/react-form-devtools@^0.2.16",
+    "@tanstack/react-form-start": "npm:@tanstack/react-form-start@^1.28.3",
+    "@tanstack/react-query": "npm:@tanstack/react-query@^5.90.21",
+    "@tanstack/react-query-devtools": "npm:@tanstack/react-query-devtools@^5.91.3",
+    "@tanstack/react-router": "npm:@tanstack/react-router@^1.163.2",
+    "@tanstack/react-router-devtools": "npm:@tanstack/react-router-devtools@^1.163.2",
+    "@tanstack/react-start": "npm:@tanstack/react-start@^1.163.2",
+    "@types/react": "npm:@types/react@^19.2.14",
+    "@types/react-dom": "npm:@types/react-dom@^19.2.3",
+    "@vitejs/plugin-react": "npm:@vitejs/plugin-react@^5.1.4",
+    "better-auth": "npm:better-auth@^1.4.19",
+    "nitro": "npm:nitro@^3.0.1-alpha.2",
+    "postcss": "npm:postcss@^8.5.6",
+    "postcss-preset-mantine": "npm:postcss-preset-mantine@^1.18.0",
+    "postcss-simple-vars": "npm:postcss-simple-vars@^7.0.1",
+    "react": "npm:react@^19.2.4",
+    "react-dom": "npm:react-dom@^19.2.4",
+    "~/": "./",
+    "react-error-boundary": "npm:react-error-boundary@^6.1.1",
+    "srvx": "npm:srvx@^0.11.8",
+    "zod": "jsr:@zod/zod@^4.3.6",
+    "@/": "./src/",
+    "@phosphor-icons/react": "npm:@phosphor-icons/react@^2.1.10",
+    "@prisma/adapter-pg": "npm:@prisma/adapter-pg@^7.4.1",
+    "@prisma/client": "npm:@prisma/client@^7.4.1",
+    "@types/pg": "npm:@types/pg@^8.16.0",
+    "pg": "npm:pg@^8.19.0",
+    "prisma": "npm:prisma@^7.4.1",
+    "url-template": "npm:url-template@^3.1.1",
+    "vite": "npm:vite@^7.3.1"
+  },
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.asynciterable",
+      "dom.iterable",
+      "deno.ns",
+      "deno.unstable"
+    ],
+    "module": "esnext",
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "noUncheckedIndexedAccess": true,
+    "jsx": "react-jsx",
+    "types": [
+      "vite/client"
+    ]
+  },
+  "allowScripts": [
+    "npm:@prisma/engines@7.4.1",
+    "npm:esbuild@0.27.3",
+    "npm:fsevents@2.3.3",
+    "npm:prisma@7.4.1"
+  ],
+  "unstable": [
+    "temporal"
+  ]
+}

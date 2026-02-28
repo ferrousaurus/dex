@@ -1,0 +1,13 @@
+.git
+.gitignore
+.vscode
+node_modules/
+prisma/generated/
+.vite/
+.output/
+.tanstack/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

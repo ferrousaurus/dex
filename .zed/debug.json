@@ -1,0 +1,29 @@
+[
+  {
+    "adapter": "JavaScript",
+    "label": "Debug App in Chrome",
+    "type": "chrome",
+    "request": "launch",
+    "url": "http://localhost:3000",
+    "webRoot": "$ZED_WORKTREE_ROOT",
+    "skipFiles": [
+      "<node_internals>/**"
+    ]
+  },
+  {
+    "adapter": "JavaScript",
+    "label": "Debug Vite Server",
+    "request": "launch",
+    "type": "pwa-node",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "runtimeExecutable": "deno",
+    "runtimeArgs": [
+      "run",
+      "-A",
+      "--inspect-brk",
+      "npm:vite",
+      "dev"
+    ],
+    "attachSimplePort": 9229
+  }
+]
