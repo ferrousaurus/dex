@@ -10,6 +10,7 @@ const getRouteEncounters = createServerFn({ method: "GET" })
     z.object({ routeId: z.number(), saveId: z.number() }).parse(input)
   )
   .handler(async ({ data, context }) => {
+    if (!context.userId) throw new Error("Unauthorized");
     await ensureSaveOwnership(data.saveId, context.userId);
 
     const encounters = await db.encounter.findMany({

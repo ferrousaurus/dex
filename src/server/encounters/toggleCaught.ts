@@ -10,6 +10,7 @@ const toggleCaught = createServerFn({ method: "POST" })
     z.object({ saveId: z.number(), speciesId: z.number() }).parse(input)
   )
   .handler(async ({ data, context }) => {
+    if (!context.userId) throw new Error("Unauthorized");
     await ensureSaveOwnership(data.saveId, context.userId);
 
     const existing = await db.caughtStatus.findUnique({
