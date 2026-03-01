@@ -37,35 +37,35 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/saves/$saveId': typeof SavesSaveIdRoute
   '/api/health': typeof ApiHealthRoute
+  '/saves/$saveId': typeof SavesSaveIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/saves/$saveId': typeof SavesSaveIdRoute
   '/api/health': typeof ApiHealthRoute
+  '/saves/$saveId': typeof SavesSaveIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/saves/$saveId': typeof SavesSaveIdRoute
   '/api/health': typeof ApiHealthRoute
+  '/saves/$saveId': typeof SavesSaveIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/saves/$saveId' | '/api/health' | '/api/auth/$'
+  fullPaths: '/' | '/api/health' | '/saves/$saveId' | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/saves/$saveId' | '/api/health' | '/api/auth/$'
-  id: '__root__' | '/' | '/saves/$saveId' | '/api/health' | '/api/auth/$'
+  to: '/' | '/api/health' | '/saves/$saveId' | '/api/auth/$'
+  id: '__root__' | '/' | '/api/health' | '/saves/$saveId' | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  SavesSaveIdRoute: typeof SavesSaveIdRoute
   ApiHealthRoute: typeof ApiHealthRoute
+  SavesSaveIdRoute: typeof SavesSaveIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -104,8 +104,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  SavesSaveIdRoute: SavesSaveIdRoute,
   ApiHealthRoute: ApiHealthRoute,
+  SavesSaveIdRoute: SavesSaveIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
