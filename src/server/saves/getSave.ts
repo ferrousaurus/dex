@@ -1,10 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import db from "@/clients/db.ts";
 import { z } from "zod";
-import authMiddleware from "../middleware/authMiddleware.ts";
+import authentication from "../middleware/authentication.ts";
 
 const getSave = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])
+  .middleware([authentication])
   .inputValidator((input) => z.object({ id: z.number() }).parse(input))
   .handler(async ({ data, context }) => {
     const save = await db.save.findUnique({

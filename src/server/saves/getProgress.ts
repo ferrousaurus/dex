@@ -1,11 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import db from "@/clients/db.ts";
 import { z } from "zod";
-import authMiddleware from "../middleware/authMiddleware.ts";
+import authentication from "../middleware/authentication.ts";
 import ensureSaveOwnership from "./ensureSaveOwnership.ts";
 
 const getProgress = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])
+  .middleware([authentication])
   .inputValidator((input) => z.object({ saveId: z.number() }).parse(input))
   .handler(async ({ data, context }) => {
     const save = await ensureSaveOwnership(data.saveId, context.userId);

@@ -5,6 +5,7 @@ import toggleCaught from "@/server/encounters/toggleCaught.ts";
 import {
   Badge,
   Box,
+  Burger,
   Button,
   Group,
   Image,
@@ -18,6 +19,7 @@ import {
   Tooltip,
   UnstyledButton,
 } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { Route as SaveRoute } from "@/routes/saves/$saveId.tsx";
@@ -198,9 +200,13 @@ function RouteListItem({
 
 // ── Save Page ─────────────────────────────────────────────────────
 
+const SIDEBAR_WIDTH = 260;
+
 export default function SavePage() {
   const { save, routes } = SaveRoute.useLoaderData();
   const navigate = useNavigate();
+
+  const [sidebarOpened, { toggle: toggleSidebar }] = useDisclosure(true);
 
   const [selectedRouteId, setSelectedRouteId] = useState<number | null>(
     routes[0]?.id ?? null,
@@ -251,12 +257,15 @@ export default function SavePage() {
       {/* ── Sidebar: route list ─────────────────────────────────── */}
       <Box
         style={{
-          width: 260,
+          width: sidebarOpened ? SIDEBAR_WIDTH : 0,
           flexShrink: 0,
-          borderRight: "1px solid var(--mantine-color-gray-3)",
+          borderRight: sidebarOpened
+            ? "1px solid var(--mantine-color-gray-3)"
+            : "none",
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
+          transition: "width 200ms ease",
         }}
       >
         {/* Save header */}
@@ -264,16 +273,23 @@ export default function SavePage() {
           p="sm"
           style={{ borderBottom: "1px solid var(--mantine-color-gray-3)" }}
         >
-          <Button
-            variant="subtle"
-            size="xs"
-            leftSection={<CaretLeft size={14} />}
-            onClick={() => navigate({ to: "/" })}
-            mb="xs"
-            px={4}
-          >
-            All Saves
-          </Button>
+          <Group justify="space-between" align="center" mb="xs">
+            <Button
+              variant="subtle"
+              size="xs"
+              leftSection={<CaretLeft size={14} />}
+              onClick={() => navigate({ to: "/" })}
+              px={4}
+            >
+              All Saves
+            </Button>
+            <Burger
+              opened={sidebarOpened}
+              onClick={toggleSidebar}
+              size="sm"
+              aria-label="Toggle route list"
+            />
+          </Group>
           <Text fw={700} size="sm" truncate>
             {save.name}
           </Text>
@@ -302,6 +318,18 @@ export default function SavePage() {
       {/* ── Main content: encounters ────────────────────────────── */}
       <ScrollArea flex={1} p="md">
         <Stack gap="md">
+          {/* Burger to reopen sidebar when collapsed */}
+          {!sidebarOpened && (
+            <Group>
+              <Burger
+                opened={sidebarOpened}
+                onClick={toggleSidebar}
+                size="sm"
+                aria-label="Toggle route list"
+              />
+            </Group>
+          )}
+
           {/* Global progress */}
           {progress && (
             <Box

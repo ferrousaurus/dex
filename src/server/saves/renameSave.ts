@@ -1,11 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import db from "@/clients/db.ts";
 import { z } from "zod";
-import authMiddleware from "../middleware/authMiddleware.ts";
+import authentication from "../middleware/authentication.ts";
 import ensureSaveOwnership from "./ensureSaveOwnership.ts";
 
 const renameSave = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([authentication])
   .inputValidator((input) =>
     z.object({ id: z.number(), name: z.string().min(1).max(64) }).parse(input)
   )
