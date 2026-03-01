@@ -6,7 +6,6 @@ import {
   Button,
   Group,
   Menu,
-  Text,
   UnstyledButton,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";

@@ -18,13 +18,14 @@ import {
   Title,
   Tooltip,
   UnstyledButton,
+  useMantineTheme,
 } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { Route as SaveRoute } from "@/routes/saves/$saveId.tsx";
 import { CaretLeft, CheckCircle } from "@phosphor-icons/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // ── Types ──────────────────────────────────────────────────────────
 
@@ -206,7 +207,24 @@ export default function SavePage() {
   const { save, routes } = SaveRoute.useLoaderData();
   const navigate = useNavigate();
 
-  const [sidebarOpened, { toggle: toggleSidebar }] = useDisclosure(true);
+  const theme = useMantineTheme();
+  const isDesktop = useMediaQuery(`(min-width: ${theme.breakpoints.md})`);
+
+  const [
+    sidebarOpened,
+    { toggle: toggleSidebar, open: openSidebar },
+  ] = useDisclosure(true);
+
+  useEffect(() => {
+    if (isDesktop) openSidebar();
+  }, [isDesktop, openSidebar]);
+
+  const sidebarIsOpen = isDesktop ? true : sidebarOpened;
+  const canToggleSidebar = !isDesktop;
+
+  const handleToggleSidebar = () => {
+    if (canToggleSidebar) toggleSidebar();
+  };
 
   const [selectedRouteId, setSelectedRouteId] = useState<number | null>(
     routes[0]?.id ?? null,
@@ -252,20 +270,33 @@ export default function SavePage() {
         display: "flex",
         height: "calc(100vh - 48px - 2 * var(--mantine-spacing-md))",
         overflow: "hidden",
+        position: "relative",
       }}
     >
       {/* ── Sidebar: route list ─────────────────────────────────── */}
       <Box
         style={{
-          width: sidebarOpened ? SIDEBAR_WIDTH : 0,
+          width: SIDEBAR_WIDTH,
           flexShrink: 0,
-          borderRight: sidebarOpened
+          borderRight: isDesktop
             ? "1px solid var(--mantine-color-gray-3)"
             : "none",
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
-          transition: "width 200ms ease",
+          position: isDesktop ? "relative" : "absolute",
+          top: 0,
+          left: 0,
+          bottom: 0,
+          zIndex: 20,
+          background: "var(--mantine-color-body)",
+          transform: isDesktop
+            ? "none"
+            : sidebarIsOpen
+            ? "translateX(0)"
+            : "translateX(-100%)",
+          transition: "transform 200ms ease",
+          boxShadow: isDesktop ? "none" : "0 0 12px rgba(0, 0, 0, 0.2)",
         }}
       >
         {/* Save header */}
@@ -283,12 +314,14 @@ export default function SavePage() {
             >
               All Saves
             </Button>
-            <Burger
-              opened={sidebarOpened}
-              onClick={toggleSidebar}
-              size="sm"
-              aria-label="Toggle route list"
-            />
+            {canToggleSidebar && (
+              <Burger
+                opened={sidebarIsOpen}
+                onClick={handleToggleSidebar}
+                size="sm"
+                aria-label="Toggle route list"
+              />
+            )}
           </Group>
           <Text fw={700} size="sm" truncate>
             {save.name}
@@ -315,15 +348,27 @@ export default function SavePage() {
         </ScrollArea>
       </Box>
 
+      {!isDesktop && sidebarIsOpen && (
+        <Box
+          onClick={handleToggleSidebar}
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "rgba(0, 0, 0, 0.4)",
+            zIndex: 10,
+          }}
+        />
+      )}
+
       {/* ── Main content: encounters ────────────────────────────── */}
       <ScrollArea flex={1} p="md">
         <Stack gap="md">
           {/* Burger to reopen sidebar when collapsed */}
-          {!sidebarOpened && (
+          {canToggleSidebar && !sidebarIsOpen && (
             <Group>
               <Burger
-                opened={sidebarOpened}
-                onClick={toggleSidebar}
+                opened={sidebarIsOpen}
+                onClick={handleToggleSidebar}
                 size="sm"
                 aria-label="Toggle route list"
               />
