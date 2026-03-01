@@ -4,7 +4,7 @@ import ensureSession from "../auth/ensureSession.ts";
 const authMiddleware = createMiddleware({ type: "function" }).server(
   async ({ next }) => {
     const session = await ensureSession();
-    if (session === undefined || session.user === undefined) {
+    if (!session || !session.user) {
       throw new Error("Unauthorized");
     }
     return next({ context: { userId: session.user.id } });
