@@ -7,6 +7,7 @@ import {
   Box,
   Burger,
   Button,
+  Flex,
   Group,
   Image,
   NavLink,
@@ -404,7 +405,7 @@ export default function SavePage() {
             <Text c="dimmed">No encounters found for this route.</Text>
           )}
           {!encLoading && encounters.length > 0 && (
-            <SimpleGrid cols={{ base: 3, xs: 4, sm: 5, md: 6, lg: 8 }}>
+            <Flex wrap="wrap" gap="md">
               {encounters.map((enc: EncounterEntry) => (
                 <PokemonCard
                   key={enc.species.id}
@@ -412,7 +413,7 @@ export default function SavePage() {
                   saveId={save.id}
                 />
               ))}
-            </SimpleGrid>
+            </Flex>
           )}
         </Stack>
       </ScrollArea>
