@@ -7,7 +7,7 @@ RUN apt update && \
 
 COPY . .
 RUN deno install && \
-    deno run build:prisma && \
+    deno run build:db && \
     deno task build
 
 EXPOSE 3000
