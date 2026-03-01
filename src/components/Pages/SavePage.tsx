@@ -268,7 +268,7 @@ export default function SavePage() {
     <Box
       style={{
         display: "flex",
-        height: "calc(100vh - 48px - 2 * var(--mantine-spacing-md))",
+        height: "calc(100dvh - 48px - 2 * var(--mantine-spacing-md))",
         overflow: "hidden",
         position: "relative",
       }}
