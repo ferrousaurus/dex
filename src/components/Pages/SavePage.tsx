@@ -6,7 +6,6 @@ import {
   Badge,
   Box,
   Burger,
-  Button,
   Group,
   Image,
   NavLink,
@@ -22,9 +21,8 @@ import {
 } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
 import { Route as SaveRoute } from "@/routes/saves/$saveId.tsx";
-import { CaretLeft, CheckCircle } from "@phosphor-icons/react";
+import { CheckCircle } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
 // ── Types ──────────────────────────────────────────────────────────
@@ -205,7 +203,6 @@ const SIDEBAR_WIDTH = 260;
 
 export default function SavePage() {
   const { save, routes } = SaveRoute.useLoaderData();
-  const navigate = useNavigate();
 
   const theme = useMantineTheme();
   const isDesktop = useMediaQuery(`(min-width: ${theme.breakpoints.md})`);
