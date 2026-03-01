@@ -3,7 +3,9 @@ import db from "@/clients/db.ts";
 import { z } from "zod";
 
 const getRoutes = createServerFn({ method: "GET" })
-  .inputValidator((input) => z.object({ gameId: z.number(), saveId: z.number() }).parse(input))
+  .inputValidator((input) =>
+    z.object({ gameId: z.number(), saveId: z.number() }).parse(input)
+  )
   .handler(async ({ data }) => {
     const routes = await db.route.findMany({
       where: { gameId: data.gameId },

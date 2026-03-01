@@ -233,7 +233,9 @@ export default function SavePage() {
     staleTime: 0,
   });
 
-  const selectedRoute = liveRoutes.find((r: RouteEntry) => r.id === selectedRouteId);
+  const selectedRoute = liveRoutes.find((r: RouteEntry) =>
+    r.id === selectedRouteId
+  );
   const progressPct = progress && progress.totalSpecies > 0
     ? Math.round((progress.caught / progress.totalSpecies) * 100)
     : 0;

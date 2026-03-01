@@ -3,7 +3,9 @@ import db from "@/clients/db.ts";
 import { z } from "zod";
 
 const toggleCaught = createServerFn({ method: "POST" })
-  .inputValidator((input) => z.object({ saveId: z.number(), speciesId: z.number() }).parse(input))
+  .inputValidator((input) =>
+    z.object({ saveId: z.number(), speciesId: z.number() }).parse(input)
+  )
   .handler(async ({ data }) => {
     const existing = await db.caughtStatus.findUnique({
       where: {
