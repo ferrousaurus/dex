@@ -14,7 +14,7 @@ if ! deno task check; then
 fi
 
 # Verify build
-if ! (deno task build:prisma && deno task build); then
+if ! (deno task build:db && deno task build); then
   echo "Build failed. Fix issues before committing." >&2
   exit 2
 fi
