@@ -17,7 +17,7 @@ jobs:
           deno-version: "2.6.10"
 
       - name: Generate Prisma client
-        run: deno task build:prisma
+        run: deno task build:db
 
       - name: Check formatting, linting, and types
         run: deno task check
