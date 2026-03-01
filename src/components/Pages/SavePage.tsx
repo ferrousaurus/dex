@@ -87,12 +87,11 @@ function PokemonCard({
 
   const tooltipContent = entry.methods
     .map((m) => {
-      const lvl =
-        m.minLevel != null
-          ? m.minLevel === m.maxLevel
-            ? `Lv ${m.minLevel}`
-            : `Lv ${m.minLevel}–${m.maxLevel}`
-          : null;
+      const lvl = m.minLevel != null
+        ? m.minLevel === m.maxLevel
+          ? `Lv ${m.minLevel}`
+          : `Lv ${m.minLevel}–${m.maxLevel}`
+        : null;
       const pct = m.chance != null ? `${m.chance}%` : null;
       return [methodLabel(m.method), lvl, pct].filter(Boolean).join(" ");
     })
@@ -167,10 +166,9 @@ function RouteListItem({
   active: boolean;
   onClick: () => void;
 }) {
-  const pct =
-    route.totalSpecies > 0
-      ? Math.round((route.caughtCount / route.totalSpecies) * 100)
-      : 0;
+  const pct = route.totalSpecies > 0
+    ? Math.round((route.caughtCount / route.totalSpecies) * 100)
+    : 0;
 
   return (
     <NavLink
@@ -236,10 +234,9 @@ export default function SavePage() {
   });
 
   const selectedRoute = liveRoutes.find((r) => r.id === selectedRouteId);
-  const progressPct =
-    progress && progress.totalSpecies > 0
-      ? Math.round((progress.caught / progress.totalSpecies) * 100)
-      : 0;
+  const progressPct = progress && progress.totalSpecies > 0
+    ? Math.round((progress.caught / progress.totalSpecies) * 100)
+    : 0;
 
   return (
     <Box

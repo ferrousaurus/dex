@@ -5,8 +5,7 @@ import { PrismaClient } from "./generated/client.ts";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { ROUTES, SPECIES, SPRITE_BASE } from "./data/kanto.ts";
 
-const DATABASE_URL =
-  Deno.env.get("DATABASE_URL") ??
+const DATABASE_URL = Deno.env.get("DATABASE_URL") ??
   "postgresql://postgres:password@localhost:5432/dex";
 
 const adapter = new PrismaPg({ connectionString: DATABASE_URL });
@@ -58,7 +57,11 @@ async function main() {
       const frRoute = await prisma.route.upsert({
         where: { slug_gameId: { slug: routeData.slug, gameId: fireRed.id } },
         update: { name: routeData.name },
-        create: { name: routeData.name, slug: routeData.slug, gameId: fireRed.id },
+        create: {
+          name: routeData.name,
+          slug: routeData.slug,
+          gameId: fireRed.id,
+        },
       });
       routeCount++;
 
@@ -72,7 +75,11 @@ async function main() {
               method: enc.method,
             },
           },
-          update: { minLevel: enc.minLevel, maxLevel: enc.maxLevel, chance: enc.chance },
+          update: {
+            minLevel: enc.minLevel,
+            maxLevel: enc.maxLevel,
+            chance: enc.chance,
+          },
           create: {
             routeId: frRoute.id,
             speciesId: enc.speciesId,
@@ -91,7 +98,11 @@ async function main() {
       const lgRoute = await prisma.route.upsert({
         where: { slug_gameId: { slug: routeData.slug, gameId: leafGreen.id } },
         update: { name: routeData.name },
-        create: { name: routeData.name, slug: routeData.slug, gameId: leafGreen.id },
+        create: {
+          name: routeData.name,
+          slug: routeData.slug,
+          gameId: leafGreen.id,
+        },
       });
       routeCount++;
 
@@ -105,7 +116,11 @@ async function main() {
               method: enc.method,
             },
           },
-          update: { minLevel: enc.minLevel, maxLevel: enc.maxLevel, chance: enc.chance },
+          update: {
+            minLevel: enc.minLevel,
+            maxLevel: enc.maxLevel,
+            chance: enc.chance,
+          },
           create: {
             routeId: lgRoute.id,
             speciesId: enc.speciesId,

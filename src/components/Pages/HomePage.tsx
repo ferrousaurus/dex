@@ -21,7 +21,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { PencilSimple, Trash } from "@phosphor-icons/react";
 import { useState } from "react";
@@ -103,8 +103,7 @@ function RenameSaveModal({
   const qc = useQueryClient();
 
   const { mutate, isPending } = useMutation({
-    mutationFn: () =>
-      renameSave({ data: { id: save!.id, name: name.trim() } }),
+    mutationFn: () => renameSave({ data: { id: save!.id, name: name.trim() } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["saves"] });
       notifications.show({ message: "Save renamed!", color: "green" });
@@ -115,8 +114,8 @@ function RenameSaveModal({
     },
   });
 
-  const canSubmit =
-    name.trim().length > 0 && name.trim() !== save?.name && !isPending;
+  const canSubmit = name.trim().length > 0 && name.trim() !== save?.name &&
+    !isPending;
 
   return (
     <Modal opened={save !== null} onClose={onClose} title="Rename Save">
@@ -169,8 +168,8 @@ function DeleteSaveModal({
     <Modal opened={save !== null} onClose={onClose} title="Delete Save">
       <Stack>
         <Text>
-          Are you sure you want to delete <strong>{save?.name}</strong>? This
-          cannot be undone.
+          Are you sure you want to delete{" "}
+          <strong>{save?.name}</strong>? This cannot be undone.
         </Text>
         <Group justify="flex-end">
           <Button variant="default" onClick={onClose}>
@@ -205,7 +204,8 @@ function SaveCard({
       radius="md"
       withBorder
       style={{ cursor: "pointer" }}
-      onClick={() => navigate({ to: "/saves/$saveId", params: { saveId: String(save.id) } })}
+      onClick={() =>
+        navigate({ to: "/saves/$saveId", params: { saveId: String(save.id) } })}
     >
       <Card.Section withBorder inheritPadding py="xs">
         <Group justify="space-between" align="center">
@@ -250,7 +250,8 @@ function SaveCard({
 // ── Home Page ─────────────────────────────────────────────────────
 
 export default function HomePage() {
-  const { saves: initialSaves, games: initialGames } = HomeRoute.useLoaderData();
+  const { saves: initialSaves, games: initialGames } = HomeRoute
+    .useLoaderData();
   const [createOpened, { open: openCreate, close: closeCreate }] =
     useDisclosure(false);
   const [renameSaveTarget, setRenameSaveTarget] = useState<Save | null>(null);
