@@ -10,6 +10,7 @@ const renameSave = createServerFn({ method: "POST" })
     z.object({ id: z.number(), name: z.string().min(1).max(64) }).parse(input)
   )
   .handler(async ({ data, context }) => {
+    if (!context.userId) throw new Error("Unauthorized");
     await ensureSaveOwnership(data.id, context.userId);
 
     return await db.save.update({

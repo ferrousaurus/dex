@@ -11,6 +11,7 @@ const createSave = createServerFn({ method: "POST" })
     )
   )
   .handler(async ({ data, context }) => {
+    if (!context.userId) throw new Error("Unauthorized");
     return await db.save.create({
       data: { name: data.name, gameId: data.gameId, userId: context.userId },
       include: { game: true },

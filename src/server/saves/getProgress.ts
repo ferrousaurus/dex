@@ -8,6 +8,7 @@ const getProgress = createServerFn({ method: "GET" })
   .middleware([authentication])
   .inputValidator((input) => z.object({ saveId: z.number() }).parse(input))
   .handler(async ({ data, context }) => {
+    if (!context.userId) throw new Error("Unauthorized");
     const save = await ensureSaveOwnership(data.saveId, context.userId);
 
     // Total unique species available in this game

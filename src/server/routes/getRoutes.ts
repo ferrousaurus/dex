@@ -10,6 +10,7 @@ const getRoutes = createServerFn({ method: "GET" })
     z.object({ gameId: z.number(), saveId: z.number() }).parse(input)
   )
   .handler(async ({ data, context }) => {
+    if (!context.userId) throw new Error("Unauthorized");
     await ensureSaveOwnership(data.saveId, context.userId);
 
     const routes = await db.route.findMany({

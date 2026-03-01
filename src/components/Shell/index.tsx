@@ -51,18 +51,18 @@ export default function Shell({ children }: Readonly<ShellProps>) {
 
   const matchRoute = useMatchRoute();
   const saveMatch = matchRoute({ to: "/saves/$saveId", fuzzy: true });
-  const currentSaveId = saveMatch?.params?.saveId
-    ? Number(saveMatch.params.saveId)
-    : null;
+  const currentSaveId = saveMatch ? Number(saveMatch.saveId) : null;
   const currentSaveGameId = currentSaveId
     ? saves.find((save) => save.id === currentSaveId)?.gameId ?? null
     : null;
 
   const { mutate: createSaveMutation, isPending: isCreating } = useMutation({
-    mutationFn: () =>
-      createSave({
-        data: { name: createName.trim(), gameId: createGameId! },
-      }),
+    mutationFn: () => {
+      if (createGameId === null) throw new Error("No game selected");
+      return createSave({
+        data: { name: createName.trim(), gameId: createGameId },
+      });
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["saves"] });
       notifications.show({ message: "Save created!", color: "green" });
@@ -180,8 +180,7 @@ export default function Shell({ children }: Readonly<ShellProps>) {
                         key={save.id}
                         label={save.name}
                         component={Link}
-                        to="/saves/$saveId"
-                        params={{ saveId: String(save.id) }}
+                        to={`/saves/${save.id}`}
                         onClick={close}
                       />
                     ))}
