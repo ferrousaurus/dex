@@ -213,7 +213,7 @@ export default function SavePage() {
   const [
     sidebarOpened,
     { toggle: toggleSidebar, open: openSidebar },
-  ] = useDisclosure(true);
+  ] = useDisclosure(false);
 
   useEffect(() => {
     if (isDesktop) openSidebar();
