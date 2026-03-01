@@ -5,7 +5,7 @@
     "jsr:@std/assert@^1.0.19": "1.0.19",
     "jsr:@std/dotenv@~0.225.6": "0.225.6",
     "jsr:@std/internal@^1.0.12": "1.0.12",
-    "jsr:@zod/zod@^4.3.6": "4.3.6",
+    "npm:zod@^4.3.6": "4.3.6",
     "npm:@deno/vite-plugin@^1.0.6": "1.0.6_vite@7.3.1__picomatch@4.0.3__jiti@2.6.1",
     "npm:@mantine/core@^8.3.15": "8.3.15_@mantine+hooks@8.3.15__react@19.2.4_react@19.2.4_react-dom@19.2.4__react@19.2.4_@types+react@19.2.14",
     "npm:@mantine/hooks@^8.3.15": "8.3.15_react@19.2.4",
@@ -2997,7 +2997,7 @@
     "dependencies": [
       "jsr:@std/assert@^1.0.19",
       "jsr:@std/dotenv@~0.225.6",
-      "jsr:@zod/zod@^4.3.6",
+      "npm:zod@^4.3.6",
       "npm:@deno/vite-plugin@^1.0.6",
       "npm:@mantine/core@^8.3.15",
       "npm:@mantine/hooks@^8.3.15",
