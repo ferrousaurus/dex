@@ -1,10 +1,17 @@
 import { createServerFn } from "@tanstack/react-start";
 import db from "@/clients/db.ts";
 import { z } from "zod";
+import authentication from "../middleware/authentication.ts";
+import ensureSaveOwnership from "../saves/ensureSaveOwnership.ts";
 
 const getRouteEncounters = createServerFn({ method: "GET" })
-  .validator(z.object({ routeId: z.number(), saveId: z.number() }))
-  .handler(async ({ data }) => {
+  .middleware([authentication])
+  .inputValidator((input) =>
+    z.object({ routeId: z.number(), saveId: z.number() }).parse(input)
+  )
+  .handler(async ({ data, context }) => {
+    await ensureSaveOwnership(data.saveId, context.userId);
+
     const encounters = await db.encounter.findMany({
       where: { routeId: data.routeId },
       include: {

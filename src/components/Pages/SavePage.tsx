@@ -5,6 +5,7 @@ import toggleCaught from "@/server/encounters/toggleCaught.ts";
 import {
   Badge,
   Box,
+  Burger,
   Button,
   Group,
   Image,
@@ -17,12 +18,14 @@ import {
   Title,
   Tooltip,
   UnstyledButton,
+  useMantineTheme,
 } from "@mantine/core";
+import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { Route as SaveRoute } from "@/routes/saves/$saveId.tsx";
 import { CaretLeft, CheckCircle } from "@phosphor-icons/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // ── Types ──────────────────────────────────────────────────────────
 
@@ -62,13 +65,13 @@ function PokemonCard({
   const { mutate, isPending } = useMutation({
     mutationFn: () =>
       toggleCaught({ data: { saveId, speciesId: entry.species.id } }),
-    onSuccess: (result) => {
+    onSuccess: (result: { caught: boolean }) => {
       // Instantly update the encounter cache without a full refetch
       qc.setQueriesData(
         { queryKey: ["routeEncounters"] },
         (old: EncounterEntry[] | undefined) => {
           if (!old) return old;
-          return old.map((e) =>
+          return old.map((e: EncounterEntry) =>
             e.species.id === entry.species.id
               ? { ...e, caught: result.caught }
               : e
@@ -86,7 +89,7 @@ function PokemonCard({
   const primaryMethod = entry.methods[0];
 
   const tooltipContent = entry.methods
-    .map((m) => {
+    .map((m: EncounterEntry["methods"][number]) => {
       const lvl = m.minLevel != null
         ? m.minLevel === m.maxLevel
           ? `Lv ${m.minLevel}`
@@ -198,9 +201,30 @@ function RouteListItem({
 
 // ── Save Page ─────────────────────────────────────────────────────
 
+const SIDEBAR_WIDTH = 260;
+
 export default function SavePage() {
   const { save, routes } = SaveRoute.useLoaderData();
   const navigate = useNavigate();
+
+  const theme = useMantineTheme();
+  const isDesktop = useMediaQuery(`(min-width: ${theme.breakpoints.md})`);
+
+  const [
+    sidebarOpened,
+    { toggle: toggleSidebar, open: openSidebar },
+  ] = useDisclosure(false);
+
+  useEffect(() => {
+    if (isDesktop) openSidebar();
+  }, [isDesktop, openSidebar]);
+
+  const sidebarIsOpen = isDesktop ? true : sidebarOpened;
+  const canToggleSidebar = !isDesktop;
+
+  const handleToggleSidebar = () => {
+    if (canToggleSidebar) toggleSidebar();
+  };
 
   const [selectedRouteId, setSelectedRouteId] = useState<number | null>(
     routes[0]?.id ?? null,
@@ -233,7 +257,9 @@ export default function SavePage() {
     staleTime: 0,
   });
 
-  const selectedRoute = liveRoutes.find((r) => r.id === selectedRouteId);
+  const selectedRoute = liveRoutes.find((r: RouteEntry) =>
+    r.id === selectedRouteId
+  );
   const progressPct = progress && progress.totalSpecies > 0
     ? Math.round((progress.caught / progress.totalSpecies) * 100)
     : 0;
@@ -242,19 +268,35 @@ export default function SavePage() {
     <Box
       style={{
         display: "flex",
-        height: "calc(100vh - 48px - 2 * var(--mantine-spacing-md))",
+        height: "calc(100dvh - 48px - 2 * var(--mantine-spacing-md))",
         overflow: "hidden",
+        position: "relative",
       }}
     >
       {/* ── Sidebar: route list ─────────────────────────────────── */}
       <Box
         style={{
-          width: 260,
+          width: SIDEBAR_WIDTH,
           flexShrink: 0,
-          borderRight: "1px solid var(--mantine-color-gray-3)",
+          borderRight: isDesktop
+            ? "1px solid var(--mantine-color-gray-3)"
+            : "none",
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
+          position: isDesktop ? "relative" : "absolute",
+          top: 0,
+          left: 0,
+          bottom: 0,
+          zIndex: 20,
+          background: "var(--mantine-color-body)",
+          transform: isDesktop
+            ? "none"
+            : sidebarIsOpen
+            ? "translateX(0)"
+            : "translateX(-100%)",
+          transition: "transform 200ms ease",
+          boxShadow: isDesktop ? "none" : "0 0 12px rgba(0, 0, 0, 0.2)",
         }}
       >
         {/* Save header */}
@@ -262,16 +304,16 @@ export default function SavePage() {
           p="sm"
           style={{ borderBottom: "1px solid var(--mantine-color-gray-3)" }}
         >
-          <Button
-            variant="subtle"
-            size="xs"
-            leftSection={<CaretLeft size={14} />}
-            onClick={() => navigate({ to: "/" })}
-            mb="xs"
-            px={4}
-          >
-            All Saves
-          </Button>
+          <Group justify="flex-end" align="center">
+            {canToggleSidebar && (
+              <Burger
+                opened={sidebarIsOpen}
+                onClick={handleToggleSidebar}
+                size="sm"
+                aria-label="Toggle route list"
+              />
+            )}
+          </Group>
           <Text fw={700} size="sm" truncate>
             {save.name}
           </Text>
@@ -286,7 +328,7 @@ export default function SavePage() {
 
         {/* Route list */}
         <ScrollArea flex={1}>
-          {liveRoutes.map((route) => (
+          {liveRoutes.map((route: RouteEntry) => (
             <RouteListItem
               key={route.id}
               route={route}
@@ -297,9 +339,33 @@ export default function SavePage() {
         </ScrollArea>
       </Box>
 
+      {!isDesktop && sidebarIsOpen && (
+        <Box
+          onClick={handleToggleSidebar}
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "rgba(0, 0, 0, 0.4)",
+            zIndex: 10,
+          }}
+        />
+      )}
+
       {/* ── Main content: encounters ────────────────────────────── */}
       <ScrollArea flex={1} p="md">
         <Stack gap="md">
+          {/* Burger to reopen sidebar when collapsed */}
+          {canToggleSidebar && (
+            <Group>
+              <Burger
+                opened={sidebarIsOpen}
+                onClick={handleToggleSidebar}
+                size="sm"
+                aria-label="Toggle route list"
+              />
+            </Group>
+          )}
+
           {/* Global progress */}
           {progress && (
             <Box
@@ -338,8 +404,8 @@ export default function SavePage() {
             <Text c="dimmed">No encounters found for this route.</Text>
           )}
           {!encLoading && encounters.length > 0 && (
-            <SimpleGrid cols={{ base: 3, xs: 4, sm: 5, md: 6, lg: 8 }}>
-              {encounters.map((enc) => (
+            <SimpleGrid cols={3}>
+              {encounters.map((enc: EncounterEntry) => (
                 <PokemonCard
                   key={enc.species.id}
                   entry={enc}

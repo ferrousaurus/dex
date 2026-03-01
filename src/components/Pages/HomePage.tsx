@@ -16,7 +16,6 @@ import {
   Stack,
   Text,
   TextInput,
-  Title,
   Tooltip,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
@@ -272,12 +271,6 @@ export default function HomePage() {
   return (
     <Stack gap="xl">
       <Group justify="space-between" align="center">
-        <div>
-          <Title order={2}>Pokémon Route Tracker</Title>
-          <Text c="dimmed" size="sm">
-            Track which Pokémon you've caught across each route
-          </Text>
-        </div>
         <Button onClick={openCreate}>New Save</Button>
       </Group>
 
@@ -288,9 +281,6 @@ export default function HomePage() {
           <Text c="dimmed">
             No saves yet. Create one to get started!
           </Text>
-          <Button mt="md" onClick={openCreate}>
-            Create Save
-          </Button>
         </Card>
       )}
 

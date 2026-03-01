@@ -1,10 +1,17 @@
 import { createServerFn } from "@tanstack/react-start";
 import db from "@/clients/db.ts";
 import { z } from "zod";
+import authentication from "../middleware/authentication.ts";
+import ensureSaveOwnership from "../saves/ensureSaveOwnership.ts";
 
 const toggleCaught = createServerFn({ method: "POST" })
-  .validator(z.object({ saveId: z.number(), speciesId: z.number() }))
-  .handler(async ({ data }) => {
+  .middleware([authentication])
+  .inputValidator((input) =>
+    z.object({ saveId: z.number(), speciesId: z.number() }).parse(input)
+  )
+  .handler(async ({ data, context }) => {
+    await ensureSaveOwnership(data.saveId, context.userId);
+
     const existing = await db.caughtStatus.findUnique({
       where: {
         saveId_speciesId: { saveId: data.saveId, speciesId: data.speciesId },

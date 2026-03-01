@@ -6,10 +6,10 @@
     "build": "vite build",
     "preview": "vite preview",
     "start": "deno -A ./.output/server/index.mjs",
-    "build:prisma": "deno run --env-file --env-file=.env.local -A prisma generate",
-    "start:prisma": "deno run --env-file --env-file=.env.local -A prisma studio",
-    "push:prisma": "deno run --env-file --env-file=.env.local -A prisma db push",
-    "seed:prisma": "deno run -A ./prisma/seed.ts"
+    "build:db": "deno run --env-file --env-file=.env.local -A prisma generate",
+    "start:db": "deno run --env-file --env-file=.env.local -A prisma studio",
+    "push:db": "deno run --env-file --env-file=.env.local -A prisma db push",
+    "seed": "deno run -A ./prisma/seed.ts"
   },
   "fmt": {
     "exclude": [
@@ -61,7 +61,7 @@
     "~/": "./",
     "react-error-boundary": "npm:react-error-boundary@^6.1.1",
     "srvx": "npm:srvx@^0.11.8",
-    "zod": "jsr:@zod/zod@^4.3.6",
+    "zod": "npm:zod@^4.3.6",
     "@/": "./src/",
     "@phosphor-icons/react": "npm:@phosphor-icons/react@^2.1.10",
     "@prisma/adapter-pg": "npm:@prisma/adapter-pg@^7.4.1",

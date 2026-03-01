@@ -1,14 +1,22 @@
 import { createServerFn } from "@tanstack/react-start";
 import db from "@/clients/db.ts";
 import { z } from "zod";
+import authentication from "../middleware/authentication.ts";
 
 const getSave = createServerFn({ method: "GET" })
-  .validator(z.object({ id: z.number() }))
-  .handler(async ({ data }) => {
-    return await db.save.findUnique({
+  .middleware([authentication])
+  .inputValidator((input) => z.object({ id: z.number() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const save = await db.save.findUnique({
       where: { id: data.id },
       include: { game: true },
     });
+
+    if (!save || save.userId !== context.userId) {
+      throw new Error("Save not found");
+    }
+
+    return save;
   });
 
 export default getSave;

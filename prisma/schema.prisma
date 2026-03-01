@@ -20,6 +20,7 @@ model User {
   updatedAt     DateTime
   sessions      Session[]
   accounts      Account[]
+  saves         Save[]
 
   @@unique([email])
   @@map("user")
@@ -87,6 +88,8 @@ model Save {
   name           String
   gameId         Int
   game           Game           @relation(fields: [gameId], references: [id])
+  userId         String
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   caughtStatuses CaughtStatus[]
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
