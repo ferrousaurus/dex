@@ -22,6 +22,7 @@ import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useMatchRoute } from "@tanstack/react-router";
 import { PropsWithChildren, useState } from "react";
+import { PencilIcon } from "@phosphor-icons/react";
 
 export type ShellProps = PropsWithChildren;
 
@@ -186,6 +187,7 @@ export default function Shell({ children }: Readonly<ShellProps>) {
                     ))}
                     <NavLink
                       label="New"
+                      rightSection={<PencilIcon size={12} />}
                       mt="xs"
                       onClick={() => {
                         setCreateGameId(game.id);
