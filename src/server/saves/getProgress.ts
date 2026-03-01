@@ -1,16 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
 import db from "@/clients/db.ts";
 import { z } from "zod";
+import authMiddleware from "../middleware/authMiddleware.ts";
+import ensureSaveOwnership from "./ensureSaveOwnership.ts";
 
 const getProgress = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
   .inputValidator((input) => z.object({ saveId: z.number() }).parse(input))
-  .handler(async ({ data }) => {
-    const save = await db.save.findUnique({
-      where: { id: data.saveId },
-      select: { gameId: true },
-    });
-
-    if (!save) throw new Error("Save not found");
+  .handler(async ({ data, context }) => {
+    const save = await ensureSaveOwnership(data.saveId, context.userId);
 
     // Total unique species available in this game
     const totalSpeciesResult = await db.encounter.findMany({

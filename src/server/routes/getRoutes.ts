@@ -1,12 +1,17 @@
 import { createServerFn } from "@tanstack/react-start";
 import db from "@/clients/db.ts";
 import { z } from "zod";
+import authMiddleware from "../middleware/authMiddleware.ts";
+import ensureSaveOwnership from "../saves/ensureSaveOwnership.ts";
 
 const getRoutes = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
   .inputValidator((input) =>
     z.object({ gameId: z.number(), saveId: z.number() }).parse(input)
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    await ensureSaveOwnership(data.saveId, context.userId);
+
     const routes = await db.route.findMany({
       where: { gameId: data.gameId },
       include: {
