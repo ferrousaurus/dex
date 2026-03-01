@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
   output   = "./generated"
@@ -71,4 +68,77 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+// ── Pokémon Tracker Models ──────────────────────────────────────────
+
+model Game {
+  id     Int     @id @default(autoincrement())
+  name   String  // "FireRed", "LeafGreen"
+  slug   String  @unique // "fire-red", "leaf-green" (matches PokeAPI version name)
+  saves  Save[]
+  routes Route[]
+
+  @@map("game")
+}
+
+model Save {
+  id             Int            @id @default(autoincrement())
+  name           String
+  gameId         Int
+  game           Game           @relation(fields: [gameId], references: [id])
+  caughtStatuses CaughtStatus[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@map("save")
+}
+
+model Species {
+  id             Int            @id // National Pokédex number
+  name           String // Display name e.g. "Bulbasaur"
+  slug           String         @unique // API slug e.g. "bulbasaur"
+  spriteUrl      String?
+  encounters     Encounter[]
+  caughtStatuses CaughtStatus[]
+
+  @@map("species")
+}
+
+model Route {
+  id         Int         @id @default(autoincrement())
+  name       String // Display name e.g. "Route 1"
+  slug       String // API location-area slug e.g. "route-1-area"
+  gameId     Int
+  game       Game        @relation(fields: [gameId], references: [id])
+  encounters Encounter[]
+
+  @@unique([slug, gameId])
+  @@map("route")
+}
+
+model Encounter {
+  id        Int     @id @default(autoincrement())
+  routeId   Int
+  route     Route   @relation(fields: [routeId], references: [id])
+  speciesId Int
+  species   Species @relation(fields: [speciesId], references: [id])
+  method    String // e.g. "walk", "surf", "old-rod", "good-rod", "super-rod"
+  minLevel  Int?
+  maxLevel  Int?
+  chance    Int? // encounter percentage
+
+  @@unique([routeId, speciesId, method])
+  @@map("encounter")
+}
+
+model CaughtStatus {
+  id        Int     @id @default(autoincrement())
+  saveId    Int
+  save      Save    @relation(fields: [saveId], references: [id], onDelete: Cascade)
+  speciesId Int
+  species   Species @relation(fields: [speciesId], references: [id])
+
+  @@unique([saveId, speciesId])
+  @@map("caught_status")
 }
