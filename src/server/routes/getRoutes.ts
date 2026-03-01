@@ -1,11 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import db from "@/clients/db.ts";
 import { z } from "zod";
-import authMiddleware from "../middleware/authMiddleware.ts";
+import authentication from "../middleware/authentication.ts";
 import ensureSaveOwnership from "../saves/ensureSaveOwnership.ts";
 
 const getRoutes = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])
+  .middleware([authentication])
   .inputValidator((input) =>
     z.object({ gameId: z.number(), saveId: z.number() }).parse(input)
   )

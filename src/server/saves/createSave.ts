@@ -1,10 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import db from "@/clients/db.ts";
 import { z } from "zod";
-import authMiddleware from "../middleware/authMiddleware.ts";
+import authentication from "../middleware/authentication.ts";
 
 const createSave = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([authentication])
   .inputValidator((input) =>
     z.object({ name: z.string().min(1).max(64), gameId: z.number() }).parse(
       input,

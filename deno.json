@@ -6,10 +6,10 @@
     "build": "vite build",
     "preview": "vite preview",
     "start": "deno -A ./.output/server/index.mjs",
-    "build:prisma": "deno run --env-file --env-file=.env.local -A prisma generate",
-    "start:prisma": "deno run --env-file --env-file=.env.local -A prisma studio",
-    "push:prisma": "deno run --env-file --env-file=.env.local -A prisma db push",
-    "seed:prisma": "deno run -A ./prisma/seed.ts"
+    "build:db": "deno run --env-file --env-file=.env.local -A prisma generate",
+    "start:db": "deno run --env-file --env-file=.env.local -A prisma studio",
+    "push:db": "deno run --env-file --env-file=.env.local -A prisma db push",
+    "seed": "deno run -A ./prisma/seed.ts"
   },
   "fmt": {
     "exclude": [

@@ -1,11 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import db from "@/clients/db.ts";
 import { z } from "zod";
-import authMiddleware from "../middleware/authMiddleware.ts";
+import authentication from "../middleware/authentication.ts";
 import ensureSaveOwnership from "../saves/ensureSaveOwnership.ts";
 
 const toggleCaught = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([authentication])
   .inputValidator((input) =>
     z.object({ saveId: z.number(), speciesId: z.number() }).parse(input)
   )
