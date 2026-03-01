@@ -21,7 +21,7 @@ if [ -d "prisma/generated" ]; then
     exit 2
   fi
 
-  if ! (deno task build:prisma && deno task build); then
+  if ! (deno task build:db && deno task build); then
     echo "Build failed. Fix issues before committing." >&2
     exit 2
   fi
