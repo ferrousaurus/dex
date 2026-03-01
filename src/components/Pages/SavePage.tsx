@@ -304,16 +304,7 @@ export default function SavePage() {
           p="sm"
           style={{ borderBottom: "1px solid var(--mantine-color-gray-3)" }}
         >
-          <Group justify="space-between" align="center" mb="xs">
-            <Button
-              variant="subtle"
-              size="xs"
-              leftSection={<CaretLeft size={14} />}
-              onClick={() => navigate({ to: "/" })}
-              px={4}
-            >
-              All Saves
-            </Button>
+          <Group justify="flex-end" align="center">
             {canToggleSidebar && (
               <Burger
                 opened={sidebarIsOpen}
@@ -364,7 +355,7 @@ export default function SavePage() {
       <ScrollArea flex={1} p="md">
         <Stack gap="md">
           {/* Burger to reopen sidebar when collapsed */}
-          {canToggleSidebar && !sidebarIsOpen && (
+          {canToggleSidebar && (
             <Group>
               <Burger
                 opened={sidebarIsOpen}
