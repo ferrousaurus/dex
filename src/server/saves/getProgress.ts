@@ -3,7 +3,7 @@ import db from "@/clients/db.ts";
 import { z } from "zod";
 
 const getProgress = createServerFn({ method: "GET" })
-  .validator(z.object({ saveId: z.number() }))
+  .inputValidator((input) => z.object({ saveId: z.number() }).parse(input))
   .handler(async ({ data }) => {
     const save = await db.save.findUnique({
       where: { id: data.saveId },

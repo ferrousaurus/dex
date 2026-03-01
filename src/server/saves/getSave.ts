@@ -3,7 +3,7 @@ import db from "@/clients/db.ts";
 import { z } from "zod";
 
 const getSave = createServerFn({ method: "GET" })
-  .validator(z.object({ id: z.number() }))
+  .inputValidator((input) => z.object({ id: z.number() }).parse(input))
   .handler(async ({ data }) => {
     return await db.save.findUnique({
       where: { id: data.id },

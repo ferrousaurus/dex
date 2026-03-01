@@ -62,13 +62,13 @@ function PokemonCard({
   const { mutate, isPending } = useMutation({
     mutationFn: () =>
       toggleCaught({ data: { saveId, speciesId: entry.species.id } }),
-    onSuccess: (result) => {
+    onSuccess: (result: { caught: boolean }) => {
       // Instantly update the encounter cache without a full refetch
       qc.setQueriesData(
         { queryKey: ["routeEncounters"] },
         (old: EncounterEntry[] | undefined) => {
           if (!old) return old;
-          return old.map((e) =>
+          return old.map((e: EncounterEntry) =>
             e.species.id === entry.species.id
               ? { ...e, caught: result.caught }
               : e
@@ -86,7 +86,7 @@ function PokemonCard({
   const primaryMethod = entry.methods[0];
 
   const tooltipContent = entry.methods
-    .map((m) => {
+    .map((m: EncounterEntry["methods"][number]) => {
       const lvl = m.minLevel != null
         ? m.minLevel === m.maxLevel
           ? `Lv ${m.minLevel}`
@@ -233,7 +233,7 @@ export default function SavePage() {
     staleTime: 0,
   });
 
-  const selectedRoute = liveRoutes.find((r) => r.id === selectedRouteId);
+  const selectedRoute = liveRoutes.find((r: RouteEntry) => r.id === selectedRouteId);
   const progressPct = progress && progress.totalSpecies > 0
     ? Math.round((progress.caught / progress.totalSpecies) * 100)
     : 0;
@@ -286,7 +286,7 @@ export default function SavePage() {
 
         {/* Route list */}
         <ScrollArea flex={1}>
-          {liveRoutes.map((route) => (
+          {liveRoutes.map((route: RouteEntry) => (
             <RouteListItem
               key={route.id}
               route={route}
@@ -339,7 +339,7 @@ export default function SavePage() {
           )}
           {!encLoading && encounters.length > 0 && (
             <SimpleGrid cols={{ base: 3, xs: 4, sm: 5, md: 6, lg: 8 }}>
-              {encounters.map((enc) => (
+              {encounters.map((enc: EncounterEntry) => (
                 <PokemonCard
                   key={enc.species.id}
                   entry={enc}
