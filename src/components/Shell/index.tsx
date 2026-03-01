@@ -29,7 +29,7 @@ export default function Shell({ children }: Readonly<ShellProps>) {
               size="sm"
             />
             <Text fw={700} size="sm">
-              Pokédex Tracker
+              DexNav
             </Text>
           </Group>
           <Group>
