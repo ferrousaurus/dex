@@ -3,12 +3,14 @@ import {
   AppShell,
   Avatar,
   Burger,
+  Button,
   Group,
   Menu,
   Text,
   UnstyledButton,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { Link } from "@tanstack/react-router";
 import { PropsWithChildren } from "react";
 
 export type ShellProps = PropsWithChildren;
@@ -28,9 +30,9 @@ export default function Shell({ children }: Readonly<ShellProps>) {
               hiddenFrom="sm"
               size="sm"
             />
-            <Text fw={700} size="sm">
+            <Button variant="transparent" component={Link} to="/" size="sm">
               DexNav
-            </Text>
+            </Button>
           </Group>
           <Group>
             <Menu>
