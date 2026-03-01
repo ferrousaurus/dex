@@ -184,16 +184,18 @@ export default function Shell({ children }: Readonly<ShellProps>) {
                         onClick={close}
                       />
                     ))}
-                    <NavLink
-                      label="New"
-                      rightSection={<PencilIcon size={12} />}
-                      mt="xs"
-                      onClick={() => {
-                        setCreateGameId(game.id);
-                        setCreateName("");
-                        openCreate();
-                      }}
-                    />
+                    {session !== null && (
+                      <NavLink
+                        label="New"
+                        rightSection={<PencilIcon size={12} />}
+                        mt="xs"
+                        onClick={() => {
+                          setCreateGameId(game.id);
+                          setCreateName("");
+                          openCreate();
+                        }}
+                      />
+                    )}
                   </NavLink>
                 );
               })}
