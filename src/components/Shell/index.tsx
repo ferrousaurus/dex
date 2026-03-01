@@ -50,7 +50,9 @@ export default function Shell({ children }: Readonly<ShellProps>) {
 
   const matchRoute = useMatchRoute();
   const saveMatch = matchRoute({ to: "/saves/$saveId", fuzzy: true });
-  const currentSaveId = saveMatch ? Number(saveMatch.params.saveId) : null;
+  const currentSaveId = saveMatch?.params?.saveId
+    ? Number(saveMatch.params.saveId)
+    : null;
   const currentSaveGameId = currentSaveId
     ? saves.find((save) => save.id === currentSaveId)?.gameId ?? null
     : null;
