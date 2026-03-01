@@ -23,4 +23,4 @@ jobs:
         run: deno task check
 
       - name: Build app
-        run: deno task app
+        run: deno task build
