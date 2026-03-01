@@ -13,15 +13,57 @@ const prisma = new PrismaClient({ adapter });
 const POKEAPI = "https://pokeapi.co/api/v2";
 const SPRITE_BASE =
   "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon";
-const FRLG_VERSIONS = new Set(["firered", "leafgreen"]);
+// ── Game configuration ────────────────────────────────────────────────
+interface GameConfig {
+  name: string;
+  dbSlug: string;
+  apiSlug: string;
+  maxSpeciesId: number;
+}
+
+const GAMES: GameConfig[] = [
+  // Gen 1
+  { name: "Red", dbSlug: "red", apiSlug: "red", maxSpeciesId: 151 },
+  { name: "Blue", dbSlug: "blue", apiSlug: "blue", maxSpeciesId: 151 },
+  { name: "Yellow", dbSlug: "yellow", apiSlug: "yellow", maxSpeciesId: 151 },
+  // Gen 2
+  { name: "Gold", dbSlug: "gold", apiSlug: "gold", maxSpeciesId: 251 },
+  { name: "Silver", dbSlug: "silver", apiSlug: "silver", maxSpeciesId: 251 },
+  { name: "Crystal", dbSlug: "crystal", apiSlug: "crystal", maxSpeciesId: 251 },
+  // Gen 3
+  { name: "Ruby", dbSlug: "ruby", apiSlug: "ruby", maxSpeciesId: 386 },
+  {
+    name: "Sapphire",
+    dbSlug: "sapphire",
+    apiSlug: "sapphire",
+    maxSpeciesId: 386,
+  },
+  { name: "Emerald", dbSlug: "emerald", apiSlug: "emerald", maxSpeciesId: 386 },
+  {
+    name: "FireRed",
+    dbSlug: "fire-red",
+    apiSlug: "firered",
+    maxSpeciesId: 386,
+  },
+  {
+    name: "LeafGreen",
+    dbSlug: "leaf-green",
+    apiSlug: "leafgreen",
+    maxSpeciesId: 386,
+  },
+];
+
+const ALL_API_SLUGS = new Set(GAMES.map((g) => g.apiSlug));
+const MAX_SPECIES_ID = Math.max(...GAMES.map((g) => g.maxSpeciesId));
 const VALID_METHODS = new Set([
   "walk",
   "surf",
   "old-rod",
   "good-rod",
   "super-rod",
+  "rock-smash",
+  "headbutt",
 ]);
-const MAX_SPECIES_ID = 150;
 const CONCURRENCY = 10;
 const MAX_RETRIES = 3;
 
@@ -71,8 +113,7 @@ interface EncounterRecord {
 interface RouteRecord {
   name: string;
   slug: string;
-  firered: EncounterRecord[];
-  leafgreen: EncounterRecord[];
+  encounters: Map<string, EncounterRecord[]>;
 }
 
 // ── Fetch helpers ──────────────────────────────────────────────────────
@@ -148,21 +189,15 @@ async function fetchAllSpecies(): Promise<SpeciesRecord[]> {
 }
 
 async function fetchAllEncounters(): Promise<
-  Map<
-    string,
-    { firered: EncounterRecord[]; leafgreen: EncounterRecord[] }
-  >
+  Map<string, Map<string, EncounterRecord[]>>
 > {
   console.log(
     `Fetching encounters for ${MAX_SPECIES_ID} pokémon from PokeAPI...`,
   );
   const ids = Array.from({ length: MAX_SPECIES_ID }, (_, i) => i + 1);
 
-  // slug -> { firered: [...], leafgreen: [...] }
-  const routeMap = new Map<
-    string,
-    { firered: EncounterRecord[]; leafgreen: EncounterRecord[] }
-  >();
+  // areaSlug -> (apiVersionSlug -> EncounterRecord[])
+  const routeMap = new Map<string, Map<string, EncounterRecord[]>>();
 
   await fetchBatch(ids, async (id) => {
     const entries = await fetchJSON<PokeAPIEncounterEntry[]>(
@@ -174,7 +209,7 @@ async function fetchAllEncounters(): Promise<
 
       for (const vd of entry.version_details) {
         const version = vd.version.name;
-        if (!FRLG_VERSIONS.has(version)) continue;
+        if (!ALL_API_SLUGS.has(version)) continue;
 
         // Group encounter details by method, then aggregate
         const byMethod = new Map<
@@ -203,12 +238,13 @@ async function fetchAllEncounters(): Promise<
         if (byMethod.size === 0) continue;
 
         if (!routeMap.has(areaSlug)) {
-          routeMap.set(areaSlug, { firered: [], leafgreen: [] });
+          routeMap.set(areaSlug, new Map());
         }
-        const route = routeMap.get(areaSlug)!;
-        const encounterList = version === "firered"
-          ? route.firered
-          : route.leafgreen;
+        const areaVersions = routeMap.get(areaSlug)!;
+        if (!areaVersions.has(version)) {
+          areaVersions.set(version, []);
+        }
+        const encounterList = areaVersions.get(version)!;
 
         for (const [method, agg] of byMethod) {
           encounterList.push({
@@ -267,32 +303,32 @@ async function main() {
 
   // Build route records
   const routes: RouteRecord[] = [];
-  for (const [slug, encounters] of encounterMap) {
+  for (const [slug, versionEncounters] of encounterMap) {
     routes.push({
       name: areaNames.get(slug) ?? slugToDisplayName(slug),
       slug,
-      firered: encounters.firered,
-      leafgreen: encounters.leafgreen,
+      encounters: versionEncounters,
     });
   }
 
   // ── 1. Games ─────────────────────────────────────────────────────
   console.log("\nCreating games...");
-  const [fireRed, leafGreen] = await Promise.all([
-    prisma.game.upsert({
-      where: { slug: "fire-red" },
+  const gameRecords = new Map<
+    string,
+    { id: number; maxSpeciesId: number }
+  >();
+  for (const cfg of GAMES) {
+    const game = await prisma.game.upsert({
+      where: { slug: cfg.dbSlug },
       update: {},
-      create: { name: "FireRed", slug: "fire-red" },
-    }),
-    prisma.game.upsert({
-      where: { slug: "leaf-green" },
-      update: {},
-      create: { name: "LeafGreen", slug: "leaf-green" },
-    }),
-  ]);
-  console.log(
-    `  ✓ FireRed (id=${fireRed.id}), LeafGreen (id=${leafGreen.id})`,
-  );
+      create: { name: cfg.name, slug: cfg.dbSlug },
+    });
+    gameRecords.set(cfg.apiSlug, {
+      id: game.id,
+      maxSpeciesId: cfg.maxSpeciesId,
+    });
+    console.log(`  ✓ ${cfg.name} (id=${game.id})`);
+  }
 
   // ── 2. Species ───────────────────────────────────────────────────
   console.log(`Upserting ${species.length} species...`);
@@ -316,68 +352,36 @@ async function main() {
   let encounterCount = 0;
 
   for (const routeData of routes) {
-    // Create FireRed route if it has encounters
-    if (routeData.firered.length > 0) {
-      const frRoute = await prisma.route.upsert({
-        where: { slug_gameId: { slug: routeData.slug, gameId: fireRed.id } },
-        update: { name: routeData.name },
-        create: {
-          name: routeData.name,
-          slug: routeData.slug,
-          gameId: fireRed.id,
-        },
-      });
-      routeCount++;
+    for (const [apiSlug, gameInfo] of gameRecords) {
+      const versionEncounters = routeData.encounters.get(apiSlug) ?? [];
+      if (versionEncounters.length === 0) continue;
 
-      for (const enc of routeData.firered) {
-        if (!speciesIds.has(enc.speciesId)) continue;
-        await prisma.encounter.upsert({
-          where: {
-            routeId_speciesId_method: {
-              routeId: frRoute.id,
-              speciesId: enc.speciesId,
-              method: enc.method,
-            },
-          },
-          update: {
-            minLevel: enc.minLevel,
-            maxLevel: enc.maxLevel,
-            chance: enc.chance,
-          },
-          create: {
-            routeId: frRoute.id,
-            speciesId: enc.speciesId,
-            method: enc.method,
-            minLevel: enc.minLevel,
-            maxLevel: enc.maxLevel,
-            chance: enc.chance,
-          },
-        });
-        encounterCount++;
-      }
-    }
+      // Filter encounters to species within this game's generation
+      const filteredEncounters = versionEncounters.filter(
+        (enc) =>
+          enc.speciesId <= gameInfo.maxSpeciesId &&
+          speciesIds.has(enc.speciesId),
+      );
+      if (filteredEncounters.length === 0) continue;
 
-    // Create LeafGreen route if it has encounters
-    if (routeData.leafgreen.length > 0) {
-      const lgRoute = await prisma.route.upsert({
+      const route = await prisma.route.upsert({
         where: {
-          slug_gameId: { slug: routeData.slug, gameId: leafGreen.id },
+          slug_gameId: { slug: routeData.slug, gameId: gameInfo.id },
         },
         update: { name: routeData.name },
         create: {
           name: routeData.name,
           slug: routeData.slug,
-          gameId: leafGreen.id,
+          gameId: gameInfo.id,
         },
       });
       routeCount++;
 
-      for (const enc of routeData.leafgreen) {
-        if (!speciesIds.has(enc.speciesId)) continue;
+      for (const enc of filteredEncounters) {
         await prisma.encounter.upsert({
           where: {
             routeId_speciesId_method: {
-              routeId: lgRoute.id,
+              routeId: route.id,
               speciesId: enc.speciesId,
               method: enc.method,
             },
@@ -388,7 +392,7 @@ async function main() {
             chance: enc.chance,
           },
           create: {
-            routeId: lgRoute.id,
+            routeId: route.id,
             speciesId: enc.speciesId,
             method: enc.method,
             minLevel: enc.minLevel,
