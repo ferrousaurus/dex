@@ -1,3 +1,4 @@
+import auth from "@/clients/auth.ts";
 import getGames from "@/server/games/getGames.ts";
 import getSaves from "@/server/saves/getSaves.ts";
 import createSave from "@/server/saves/createSave.ts";
@@ -249,6 +250,7 @@ function SaveCard({
 // ── Home Page ─────────────────────────────────────────────────────
 
 export default function HomePage() {
+  const { data: session, isPending } = auth.useSession();
   const { saves: initialSaves, games: initialGames } = HomeRoute
     .useLoaderData();
   const [createOpened, { open: openCreate, close: closeCreate }] =
@@ -267,6 +269,20 @@ export default function HomePage() {
     queryFn: () => getSaves(),
     initialData: initialSaves,
   });
+
+  if (isPending) {
+    return null;
+  }
+
+  if (!session) {
+    return (
+      <Stack align="center" justify="center" style={{ flex: 1 }}>
+        <Button onClick={() => auth.signIn.social({ provider: "discord" })}>
+          Sign In
+        </Button>
+      </Stack>
+    );
+  }
 
   return (
     <Stack gap="xl">
