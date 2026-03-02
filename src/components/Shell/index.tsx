@@ -111,14 +111,30 @@ export default function Shell({ children }: Readonly<ShellProps>) {
 }
 
 function SaveBreadcrumb({ saveId }: { saveId: string }) {
+  const { data } = useQuery({
+    queryKey: ["saves", { saveId: Number(saveId) }],
+    queryFn: () => getSave({ data: { id: Number(saveId) } }),
+  });
+
   return (
-    <Anchor
-      component={Link}
-      to="/saves/$saveId"
-      params={{ saveId }}
-    >
-      Save
-    </Anchor>
+    <>
+      <Anchor
+        component={Link}
+        to="/saves/$saveId"
+        params={{ saveId }}
+        visibleFrom="md"
+      >
+        {data?.name ?? "Save"}
+      </Anchor>
+      <Anchor
+        component={Link}
+        to="/saves/$saveId"
+        params={{ saveId }}
+        hiddenFrom="md"
+      >
+        {data?.name ?? "Save"}
+      </Anchor>
+    </>
   );
 }
 
@@ -143,13 +159,24 @@ function RouteBreadcrumb(
   });
 
   return (
-    <Anchor
-      component={Link}
-      to="/saves/$saveId/routes/$routeId"
-      params={{ saveId, routeId }}
-    >
-      {!isSuccess ? `Route ${routeId}` : data.name}
-    </Anchor>
+    <>
+      <Anchor
+        component={Link}
+        to="/saves/$saveId/routes/$routeId"
+        params={{ saveId, routeId }}
+        hiddenFrom="md"
+      >
+        Route
+      </Anchor>
+      <Anchor
+        component={Link}
+        to="/saves/$saveId/routes/$routeId"
+        params={{ saveId, routeId }}
+        visibleFrom="md"
+      >
+        {!isSuccess ? `Route ${routeId}` : data.name}
+      </Anchor>
+    </>
   );
 }
 
