@@ -1,5 +1,6 @@
 import getRouteEncounters from "@/server/routes/getRouteEncounters.ts";
 import getRoutes from "@/server/routes/getRoutes.ts";
+import { getGameColor } from "@/lib/gameColors.ts";
 import getProgress from "@/server/saves/getProgress.ts";
 import toggleCaught from "@/server/encounters/toggleCaught.ts";
 import {
@@ -316,7 +317,7 @@ export default function SaveRoutePage(
           <Badge
             size="xs"
             mt={2}
-            color={save.game.slug === "fire-red" ? "red" : "green"}
+            color={getGameColor(save.game.slug)}
           >
             {save.game.name}
           </Badge>

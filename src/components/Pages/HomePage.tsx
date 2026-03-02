@@ -4,6 +4,7 @@ import getSaves from "@/server/saves/getSaves.ts";
 import createSave from "@/server/saves/createSave.ts";
 import renameSave from "@/server/saves/renameSave.ts";
 import deleteSave from "@/server/saves/deleteSave.ts";
+import { getGameColor } from "@/lib/gameColors.ts";
 import { Route as HomeRoute } from "@/routes/index.tsx";
 import {
   ActionIcon,
@@ -244,7 +245,7 @@ function SaveCard({
         </Group>
       </Card.Section>
       <Group mt="md" align="center">
-        <Badge color={save.game.slug === "fire-red" ? "red" : "green"}>
+        <Badge color={getGameColor(save.game.slug)}>
           {save.game.name}
         </Badge>
         <Text size="xs" c="dimmed">
