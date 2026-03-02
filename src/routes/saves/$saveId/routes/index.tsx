@@ -5,7 +5,6 @@ import getRoutes from "@/server/routes/getRoutes.ts";
 import { Card, Menu, Progress, SimpleGrid, Stack, Text } from "@mantine/core";
 import { Save } from "~/prisma/generated/client.ts";
 import { BASE_NAME_FALLBACK_LABELS, groupRoutes } from "@/lib/groupRoutes.ts";
-import { useMemo } from "react";
 
 export const Route = createFileRoute("/saves/$saveId/routes/")({
   component: () => {
@@ -142,7 +141,7 @@ function GroupedRouteCard({
 
 function SaveRoutesPage({ saveId }: Readonly<SavePageProps>) {
   const { data: save } = useQuery({
-    queryKey: ["saves", saveId],
+    queryKey: ["saves", { saveId }],
     queryFn: () => getSave({ data: { id: saveId } }),
   });
 

@@ -1,10 +1,12 @@
 import auth from "@/clients/auth.ts";
+import { BASE_NAME_FALLBACK_LABELS, groupRoutes } from "@/lib/groupRoutes.ts";
 import getSaves from "@/server/saves/getSaves.ts";
 import {
+  Anchor,
   AppShell,
   Avatar,
+  Breadcrumbs,
   Burger,
-  Button,
   Group,
   Menu,
   NavLink,
@@ -13,14 +15,14 @@ import {
   Stack,
   UnstyledButton,
 } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
-import { PropsWithChildren, useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
-import getSave from "../../server/saves/getSave.ts";
+import { useQuery } from "@tanstack/react-query";
+import { Link, useParams } from "@tanstack/react-router";
+import { PropsWithChildren } from "react";
 import getRoutes from "../../server/routes/getRoutes.ts";
-import { BASE_NAME_FALLBACK_LABELS, groupRoutes } from "@/lib/groupRoutes.ts";
-import { useParams } from "@tanstack/react-router";
+import getSave from "../../server/saves/getSave.ts";
+import { useLocation } from "@tanstack/react-router";
+import getRoute from "../../server/routes/getRoute.ts";
 
 export type ShellProps = PropsWithChildren;
 
@@ -49,9 +51,7 @@ export default function Shell({ children }: Readonly<ShellProps>) {
             {params.saveId !== undefined && (
               <Burger opened={opened} onClick={toggle} hiddenFrom="sm" />
             )}
-            <Button variant="transparent" component={Link} to="/" size="sm">
-              DexNav
-            </Button>
+            <ShellBreadcrumbs />
           </Group>
           <Group>
             <Menu>
@@ -110,6 +110,72 @@ export default function Shell({ children }: Readonly<ShellProps>) {
   );
 }
 
+function SaveBreadcrumb({ saveId }: { saveId: string }) {
+  return (
+    <Anchor
+      component={Link}
+      to="/saves/$saveId"
+      params={{ saveId }}
+    >
+      Save
+    </Anchor>
+  );
+}
+
+function RoutesBreadcrumb({ saveId }: { saveId: string }) {
+  return (
+    <Anchor
+      component={Link}
+      to="/saves/$saveId/routes"
+      params={{ saveId }}
+    >
+      Routes
+    </Anchor>
+  );
+}
+
+function RouteBreadcrumb(
+  { saveId, routeId }: { saveId: string; routeId: string },
+) {
+  const { isSuccess, data } = useQuery({
+    queryKey: ["routes", { saveId: Number(saveId), routeId: Number(routeId) }],
+    queryFn: () => getRoute({ data: { routeId, saveId } }),
+  });
+
+  return (
+    <Anchor
+      component={Link}
+      to="/saves/$saveId/routes/$routeId"
+      params={{ saveId, routeId }}
+    >
+      {!isSuccess ? `Route ${routeId}` : data.name}
+    </Anchor>
+  );
+}
+
+function ShellBreadcrumbs() {
+  const params = useParams({ strict: false });
+  const location = useLocation();
+
+  return (
+    <Breadcrumbs>
+      <Anchor component={Link} to="/" size="sm">
+        DexNav
+      </Anchor>
+      {params.saveId && <SaveBreadcrumb saveId={params.saveId} />}
+      {params.saveId && location.pathname.includes("/routes") && (
+        <RoutesBreadcrumb saveId={params.saveId} />
+      )}
+      {params.saveId && params.routeId && (
+        <RouteBreadcrumb
+          saveId={params.saveId}
+          routeId={params.routeId}
+        />
+      )}
+    </Breadcrumbs>
+  );
+}
+
 function Navbar({ onClick }: { onClick: NavLinkProps["onClick"] }) {
   const params = useParams({
     strict: false,
@@ -132,7 +198,7 @@ function SaveNavLinks(
   { saveId, onClick }: { saveId: Save["id"]; onClick: NavLinkProps["onClick"] },
 ) {
   const { isPending, isError, data } = useQuery({
-    queryKey: ["saves", saveId],
+    queryKey: ["saves", { saveId }],
     queryFn: () => getSave({ data: { id: saveId } }),
   });
 

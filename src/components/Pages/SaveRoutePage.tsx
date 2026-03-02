@@ -241,7 +241,7 @@ export default function SaveRoutePage(
 
   // Encounters for the selected route
   const { data: encounters = [], isLoading: encLoading } = useQuery({
-    queryKey: ["routeEncounters", routeId, save.id],
+    queryKey: ["routeEncounters", { routeId, saveId: save.id }],
     queryFn: () =>
       getRouteEncounters({
         data: { routeId, saveId: save.id },
@@ -251,7 +251,7 @@ export default function SaveRoutePage(
 
   // Overall progress
   const { data: progress } = useQuery({
-    queryKey: ["progress", save.id],
+    queryKey: ["progress", { saveId: save.id }],
     queryFn: () => getProgress({ data: { saveId: save.id } }),
     staleTime: 0,
   });

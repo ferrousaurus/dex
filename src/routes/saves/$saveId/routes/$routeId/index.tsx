@@ -50,12 +50,12 @@ export type SaveRoutePage = {
 
 function SaveRoutePage({ saveId, routeId }: Readonly<SaveRoutePage>) {
   const { data: route } = useQuery({
-    queryKey: ["routes", routeId],
+    queryKey: ["routes", { saveId, routeId }],
     queryFn: () => getRoute({ data: { routeId, saveId } }),
   });
 
   const { data: encounters = [], isLoading: encLoading } = useQuery({
-    queryKey: ["routeEncounters", routeId, saveId],
+    queryKey: ["routeEncounters", { routeId, saveId }],
     queryFn: () =>
       getRouteEncounters({
         data: { routeId, saveId },
@@ -65,7 +65,7 @@ function SaveRoutePage({ saveId, routeId }: Readonly<SaveRoutePage>) {
 
   // Overall progress
   const { data: progress } = useQuery({
-    queryKey: ["progress", saveId],
+    queryKey: ["progress", { saveId }],
     queryFn: () => getProgress({ data: { saveId } }),
     staleTime: 0,
   });

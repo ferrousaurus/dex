@@ -1,23 +1,11 @@
 import toggleCaught from "@/server/encounters/toggleCaught.ts";
 import getRouteEncounters from "@/server/routes/getRouteEncounters.ts";
-import getRoutes from "@/server/routes/getRoutes.ts";
-import {
-  Box,
-  Group,
-  Image,
-  NavLink,
-  Progress,
-  Stack,
-  Text,
-  Tooltip,
-  UnstyledButton,
-} from "@mantine/core";
+import { Box, Image, Text, Tooltip, UnstyledButton } from "@mantine/core";
 import { CheckCircle } from "@phosphor-icons/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 // ── Types ──────────────────────────────────────────────────────────
 
-type RouteEntry = Awaited<ReturnType<typeof getRoutes>>[number];
 type EncounterEntry = Awaited<ReturnType<typeof getRouteEncounters>>[number];
 
 // ── Method label helper ────────────────────────────────────────────
@@ -147,46 +135,5 @@ export default function PokemonCard({
         </Box>
       </UnstyledButton>
     </Tooltip>
-  );
-}
-
-// ── Route List Item ───────────────────────────────────────────────
-
-function RouteListItem({
-  route,
-  active,
-  onClick,
-}: {
-  route: RouteEntry;
-  active: boolean;
-  onClick: () => void;
-}) {
-  const pct = route.totalSpecies > 0
-    ? Math.round((route.caughtCount / route.totalSpecies) * 100)
-    : 0;
-
-  return (
-    <NavLink
-      active={active}
-      onClick={onClick}
-      label={
-        <Stack gap={2}>
-          <Text size="sm" fw={active ? 600 : 400} truncate>
-            {route.name}
-          </Text>
-          <Group gap={6} align="center" wrap="nowrap">
-            <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap" }}>
-              {route.caughtCount}/{route.totalSpecies}
-            </Text>
-            <Progress
-              value={pct}
-              size="xs"
-              flex={1}
-              color={pct === 100 ? "green" : "blue"}
-            />
-          </Group>
-        </Stack>
-      }
-    />
   );
 }
