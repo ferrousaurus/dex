@@ -23,7 +23,7 @@ import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Route as SaveRoute } from "@/routes/saves/$saveId.tsx";
 import { CheckCircle } from "@phosphor-icons/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 // ── Types ──────────────────────────────────────────────────────────
 
@@ -109,7 +109,7 @@ function PokemonCard({
               caught ? theme.colors.green[6] : theme.colors.gray[3]
             }`,
             background: caught ? theme.colors.green[0] : theme.colors.gray[0],
-            opacity: caught ? 1 : 0.5,
+            opacity: caught ? 1 : 0.7,
             transition: "all 0.15s ease",
             position: "relative",
             cursor: isPending ? "wait" : "pointer",
@@ -137,7 +137,11 @@ function PokemonCard({
                 w={64}
                 h={64}
                 mx="auto"
-                style={{ imageRendering: "pixelated" }}
+                style={{
+                  imageRendering: "pixelated",
+                  filter: caught ? "none" : "brightness(0)",
+                  transition: "filter 0.15s ease",
+                }}
               />
             )
             : <Box w={64} h={64} mx="auto" />}
@@ -205,23 +209,15 @@ export default function SavePage() {
   const { save, routes } = SaveRoute.useLoaderData();
 
   const theme = useMantineTheme();
-  const isDesktop = useMediaQuery(`(min-width: ${theme.breakpoints.md})`);
+  const isDesktop = useMediaQuery(
+    `(min-width: ${theme.breakpoints.md})`,
+    false,
+  );
 
   const [
     sidebarOpened,
-    { toggle: toggleSidebar, open: openSidebar },
+    { toggle: toggleSidebar },
   ] = useDisclosure(false);
-
-  useEffect(() => {
-    if (isDesktop) openSidebar();
-  }, [isDesktop, openSidebar]);
-
-  const sidebarIsOpen = isDesktop ? true : sidebarOpened;
-  const canToggleSidebar = !isDesktop;
-
-  const handleToggleSidebar = () => {
-    if (canToggleSidebar) toggleSidebar();
-  };
 
   const [selectedRouteId, setSelectedRouteId] = useState<number | null>(
     routes[0]?.id ?? null,
@@ -289,7 +285,7 @@ export default function SavePage() {
           background: "var(--mantine-color-body)",
           transform: isDesktop
             ? "none"
-            : sidebarIsOpen
+            : sidebarOpened
             ? "translateX(0)"
             : "translateX(-100%)",
           transition: "transform 200ms ease",
@@ -302,10 +298,10 @@ export default function SavePage() {
           style={{ borderBottom: "1px solid var(--mantine-color-gray-3)" }}
         >
           <Group justify="flex-end" align="center">
-            {canToggleSidebar && (
+            {!isDesktop && (
               <Burger
-                opened={sidebarIsOpen}
-                onClick={handleToggleSidebar}
+                opened={sidebarOpened}
+                onClick={toggleSidebar}
                 size="sm"
                 aria-label="Toggle route list"
               />
@@ -336,9 +332,9 @@ export default function SavePage() {
         </ScrollArea>
       </Box>
 
-      {!isDesktop && sidebarIsOpen && (
+      {!isDesktop && sidebarOpened && (
         <Box
-          onClick={handleToggleSidebar}
+          onClick={toggleSidebar}
           style={{
             position: "absolute",
             inset: 0,
@@ -352,11 +348,11 @@ export default function SavePage() {
       <ScrollArea flex={1} p="md">
         <Stack gap="md">
           {/* Burger to reopen sidebar when collapsed */}
-          {canToggleSidebar && (
+          {!isDesktop && (
             <Group>
               <Burger
-                opened={sidebarIsOpen}
-                onClick={handleToggleSidebar}
+                opened={sidebarOpened}
+                onClick={toggleSidebar}
                 size="sm"
                 aria-label="Toggle route list"
               />
