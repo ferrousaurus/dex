@@ -51,7 +51,7 @@ export type SaveRoutePage = {
 function SaveRoutePage({ saveId, routeId }: Readonly<SaveRoutePage>) {
   const { data: route } = useQuery({
     queryKey: ["routes", routeId],
-    queryFn: () => getRoute({ data: { routeId } }),
+    queryFn: () => getRoute({ data: { routeId, saveId } }),
   });
 
   const { data: encounters = [], isLoading: encLoading } = useQuery({

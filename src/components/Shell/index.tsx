@@ -8,6 +8,7 @@ import {
   Group,
   Menu,
   NavLink,
+  NavLinkProps,
   ScrollArea,
   Stack,
   UnstyledButton,
@@ -28,7 +29,7 @@ type Save = Awaited<ReturnType<typeof getSaves>>[number];
 export default function Shell({ children }: Readonly<ShellProps>) {
   const params = useParams({ strict: false });
   const { data: session } = auth.useSession();
-  const [opened, { toggle }] = useDisclosure(false);
+  const [opened, { close, toggle }] = useDisclosure(false);
 
   return (
     <AppShell
@@ -91,7 +92,7 @@ export default function Shell({ children }: Readonly<ShellProps>) {
       {session !== undefined && (
         <AppShell.Navbar>
           <ScrollArea>
-            <Navbar />
+            <Navbar onClick={close} />
           </ScrollArea>
         </AppShell.Navbar>
       )}
@@ -109,7 +110,7 @@ export default function Shell({ children }: Readonly<ShellProps>) {
   );
 }
 
-function Navbar() {
+function Navbar({ onClick }: { onClick: NavLinkProps["onClick"] }) {
   const params = useParams({
     strict: false,
   });
@@ -124,10 +125,12 @@ function Navbar() {
     return null;
   }
 
-  return <SaveNavLinks saveId={saveId} />;
+  return <SaveNavLinks saveId={saveId} onClick={onClick} />;
 }
 
-function SaveNavLinks({ saveId }: { saveId: Save["id"] }) {
+function SaveNavLinks(
+  { saveId, onClick }: { saveId: Save["id"]; onClick: NavLinkProps["onClick"] },
+) {
   const { isPending, isError, data } = useQuery({
     queryKey: ["saves", saveId],
     queryFn: () => getSave({ data: { id: saveId } }),
@@ -141,10 +144,12 @@ function SaveNavLinks({ saveId }: { saveId: Save["id"] }) {
     return null;
   }
 
-  return <SaveGameNavLinks save={data} />;
+  return <SaveGameNavLinks save={data} onClick={onClick} />;
 }
 
-function SaveGameNavLinks({ save }: { save: Save }) {
+function SaveGameNavLinks(
+  { save, onClick }: { save: Save; onClick: NavLinkProps["onClick"] },
+) {
   const { isPending, isError, data } = useQuery({
     queryKey: ["routes", { saveId: save.id, gameId: save.game.id }],
     queryFn: () =>
@@ -175,6 +180,7 @@ function SaveGameNavLinks({ save }: { save: Save }) {
               label={item.route.name}
               component={Link}
               to="/saves/$saveId/routes/$routeId"
+              onClick={onClick}
               params={{
                 saveId: save.id,
                 routeId: item.route.id,
@@ -198,6 +204,7 @@ function SaveGameNavLinks({ save }: { save: Save }) {
                     label={suffix}
                     component={Link}
                     to="/saves/$saveId/routes/$routeId"
+                    onClick={onClick}
                     params={{
                       saveId: save.id,
                       routeId: route.id,
