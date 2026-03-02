@@ -132,7 +132,7 @@ function SaveBreadcrumb({ saveId }: { saveId: string }) {
         params={{ saveId }}
         hiddenFrom="md"
       >
-        {data?.name ?? "Save"}
+        Save
       </Anchor>
     </>
   );
