@@ -21,9 +21,10 @@ import {
 } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Route as SaveRoute } from "@/routes/saves/$saveId.tsx";
+import { Route as SaveRoute } from "@/routes/saves/$saveId/index.tsx";
 import { CheckCircle } from "@phosphor-icons/react";
-import { useState } from "react";
+import { Route, Save } from "../../../prisma/generated/client.ts";
+import { useNavigate } from "@tanstack/react-router";
 
 // ── Types ──────────────────────────────────────────────────────────
 
@@ -205,8 +206,17 @@ function RouteListItem({
 
 const SIDEBAR_WIDTH = 260;
 
-export default function SavePage() {
+export type SaveRoutePageProps = {
+  routeId: Route["id"];
+  saveId: Save["id"];
+};
+
+export default function SaveRoutePage(
+  { routeId, saveId }: Readonly<SaveRoutePageProps>,
+) {
   const { save, routes } = SaveRoute.useLoaderData();
+
+  const navigate = useNavigate();
 
   const theme = useMantineTheme();
   const isDesktop = useMediaQuery(
@@ -219,10 +229,6 @@ export default function SavePage() {
     { toggle: toggleSidebar },
   ] = useDisclosure(false);
 
-  const [selectedRouteId, setSelectedRouteId] = useState<number | null>(
-    routes[0]?.id ?? null,
-  );
-
   // Live route list (refetches after caught toggle)
   const { data: liveRoutes = routes } = useQuery({
     queryKey: ["routes", save.id],
@@ -234,12 +240,11 @@ export default function SavePage() {
 
   // Encounters for the selected route
   const { data: encounters = [], isLoading: encLoading } = useQuery({
-    queryKey: ["routeEncounters", selectedRouteId, save.id],
+    queryKey: ["routeEncounters", routeId, save.id],
     queryFn: () =>
       getRouteEncounters({
-        data: { routeId: selectedRouteId!, saveId: save.id },
+        data: { routeId, saveId: save.id },
       }),
-    enabled: selectedRouteId !== null,
     staleTime: 0,
   });
 
@@ -250,9 +255,7 @@ export default function SavePage() {
     staleTime: 0,
   });
 
-  const selectedRoute = liveRoutes.find((r: RouteEntry) =>
-    r.id === selectedRouteId
-  );
+  const selectedRoute = liveRoutes.find((r: RouteEntry) => r.id === routeId);
   const progressPct = progress && progress.totalSpecies > 0
     ? Math.round((progress.caught / progress.totalSpecies) * 100)
     : 0;
@@ -325,8 +328,10 @@ export default function SavePage() {
             <RouteListItem
               key={route.id}
               route={route}
-              active={route.id === selectedRouteId}
-              onClick={() => setSelectedRouteId(route.id)}
+              active={route.id === routeId}
+              onClick={() => {
+                navigate({ to: `/saves/${saveId}/routes/${route.id}` });
+              }}
             />
           ))}
         </ScrollArea>

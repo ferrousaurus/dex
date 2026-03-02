@@ -10,18 +10,21 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SavesSaveIdRouteImport } from './routes/saves/$saveId'
+import { Route as SavesIndexRouteImport } from './routes/saves/index'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
+import { Route as SavesSaveIdIndexRouteImport } from './routes/saves/$saveId/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as SavesSaveIdRoutesIndexRouteImport } from './routes/saves/$saveId/routes/index'
+import { Route as SavesSaveIdRoutesRouteIdIndexRouteImport } from './routes/saves/$saveId/routes/$routeId/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SavesSaveIdRoute = SavesSaveIdRouteImport.update({
-  id: '/saves/$saveId',
-  path: '/saves/$saveId',
+const SavesIndexRoute = SavesIndexRouteImport.update({
+  id: '/saves/',
+  path: '/saves/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiHealthRoute = ApiHealthRouteImport.update({
@@ -29,44 +32,94 @@ const ApiHealthRoute = ApiHealthRouteImport.update({
   path: '/api/health',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SavesSaveIdIndexRoute = SavesSaveIdIndexRouteImport.update({
+  id: '/saves/$saveId/',
+  path: '/saves/$saveId/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SavesSaveIdRoutesIndexRoute = SavesSaveIdRoutesIndexRouteImport.update({
+  id: '/saves/$saveId/routes/',
+  path: '/saves/$saveId/routes/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SavesSaveIdRoutesRouteIdIndexRoute =
+  SavesSaveIdRoutesRouteIdIndexRouteImport.update({
+    id: '/saves/$saveId/routes/$routeId/',
+    path: '/saves/$saveId/routes/$routeId/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/api/health': typeof ApiHealthRoute
-  '/saves/$saveId': typeof SavesSaveIdRoute
+  '/saves/': typeof SavesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/saves/$saveId/': typeof SavesSaveIdIndexRoute
+  '/saves/$saveId/routes/': typeof SavesSaveIdRoutesIndexRoute
+  '/saves/$saveId/routes/$routeId/': typeof SavesSaveIdRoutesRouteIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api/health': typeof ApiHealthRoute
-  '/saves/$saveId': typeof SavesSaveIdRoute
+  '/saves': typeof SavesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/saves/$saveId': typeof SavesSaveIdIndexRoute
+  '/saves/$saveId/routes': typeof SavesSaveIdRoutesIndexRoute
+  '/saves/$saveId/routes/$routeId': typeof SavesSaveIdRoutesRouteIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/api/health': typeof ApiHealthRoute
-  '/saves/$saveId': typeof SavesSaveIdRoute
+  '/saves/': typeof SavesIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/saves/$saveId/': typeof SavesSaveIdIndexRoute
+  '/saves/$saveId/routes/': typeof SavesSaveIdRoutesIndexRoute
+  '/saves/$saveId/routes/$routeId/': typeof SavesSaveIdRoutesRouteIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/health' | '/saves/$saveId' | '/api/auth/$'
+  fullPaths:
+    | '/'
+    | '/api/health'
+    | '/saves/'
+    | '/api/auth/$'
+    | '/saves/$saveId/'
+    | '/saves/$saveId/routes/'
+    | '/saves/$saveId/routes/$routeId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/health' | '/saves/$saveId' | '/api/auth/$'
-  id: '__root__' | '/' | '/api/health' | '/saves/$saveId' | '/api/auth/$'
+  to:
+    | '/'
+    | '/api/health'
+    | '/saves'
+    | '/api/auth/$'
+    | '/saves/$saveId'
+    | '/saves/$saveId/routes'
+    | '/saves/$saveId/routes/$routeId'
+  id:
+    | '__root__'
+    | '/'
+    | '/api/health'
+    | '/saves/'
+    | '/api/auth/$'
+    | '/saves/$saveId/'
+    | '/saves/$saveId/routes/'
+    | '/saves/$saveId/routes/$routeId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApiHealthRoute: typeof ApiHealthRoute
-  SavesSaveIdRoute: typeof SavesSaveIdRoute
+  SavesIndexRoute: typeof SavesIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  SavesSaveIdIndexRoute: typeof SavesSaveIdIndexRoute
+  SavesSaveIdRoutesIndexRoute: typeof SavesSaveIdRoutesIndexRoute
+  SavesSaveIdRoutesRouteIdIndexRoute: typeof SavesSaveIdRoutesRouteIdIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -78,11 +131,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/saves/$saveId': {
-      id: '/saves/$saveId'
-      path: '/saves/$saveId'
-      fullPath: '/saves/$saveId'
-      preLoaderRoute: typeof SavesSaveIdRouteImport
+    '/saves/': {
+      id: '/saves/'
+      path: '/saves'
+      fullPath: '/saves/'
+      preLoaderRoute: typeof SavesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/health': {
@@ -92,11 +145,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/saves/$saveId/': {
+      id: '/saves/$saveId/'
+      path: '/saves/$saveId'
+      fullPath: '/saves/$saveId/'
+      preLoaderRoute: typeof SavesSaveIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/saves/$saveId/routes/': {
+      id: '/saves/$saveId/routes/'
+      path: '/saves/$saveId/routes'
+      fullPath: '/saves/$saveId/routes/'
+      preLoaderRoute: typeof SavesSaveIdRoutesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/saves/$saveId/routes/$routeId/': {
+      id: '/saves/$saveId/routes/$routeId/'
+      path: '/saves/$saveId/routes/$routeId'
+      fullPath: '/saves/$saveId/routes/$routeId/'
+      preLoaderRoute: typeof SavesSaveIdRoutesRouteIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -105,8 +179,11 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApiHealthRoute: ApiHealthRoute,
-  SavesSaveIdRoute: SavesSaveIdRoute,
+  SavesIndexRoute: SavesIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  SavesSaveIdIndexRoute: SavesSaveIdIndexRoute,
+  SavesSaveIdRoutesIndexRoute: SavesSaveIdRoutesIndexRoute,
+  SavesSaveIdRoutesRouteIdIndexRoute: SavesSaveIdRoutesRouteIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
