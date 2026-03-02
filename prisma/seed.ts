@@ -125,6 +125,63 @@ const ENCOUNTER_FALLBACKS: Record<string, string> = {
   "omega-ruby": "ruby",
   "alpha-sapphire": "sapphire",
 };
+
+// Starter Pokémon per game (keyed by apiSlug)
+const GAME_STARTERS: Record<string, number[]> = {
+  red: [1, 4, 7],
+  blue: [1, 4, 7],
+  yellow: [25],
+  gold: [152, 155, 158],
+  silver: [152, 155, 158],
+  crystal: [152, 155, 158],
+  ruby: [252, 255, 258],
+  sapphire: [252, 255, 258],
+  emerald: [252, 255, 258],
+  firered: [1, 4, 7],
+  leafgreen: [1, 4, 7],
+  diamond: [387, 390, 393],
+  pearl: [387, 390, 393],
+  platinum: [387, 390, 393],
+  heartgold: [152, 155, 158],
+  soulsilver: [152, 155, 158],
+  black: [495, 498, 501],
+  white: [495, 498, 501],
+  "black-2": [495, 498, 501],
+  "white-2": [495, 498, 501],
+  x: [650, 653, 656],
+  y: [650, 653, 656],
+  "omega-ruby": [252, 255, 258],
+  "alpha-sapphire": [252, 255, 258],
+};
+
+// Game version pairs (apiSlug → opposite apiSlug(s))
+// Third-version games pair with both base versions.
+const GAME_PAIRS: Record<string, string[]> = {
+  red: ["blue"],
+  blue: ["red"],
+  yellow: ["red", "blue"],
+  gold: ["silver"],
+  silver: ["gold"],
+  crystal: ["gold", "silver"],
+  ruby: ["sapphire"],
+  sapphire: ["ruby"],
+  emerald: ["ruby", "sapphire"],
+  firered: ["leafgreen"],
+  leafgreen: ["firered"],
+  diamond: ["pearl"],
+  pearl: ["diamond"],
+  platinum: ["diamond", "pearl"],
+  heartgold: ["soulsilver"],
+  soulsilver: ["heartgold"],
+  black: ["white"],
+  white: ["black"],
+  "black-2": ["white-2"],
+  "white-2": ["black-2"],
+  x: ["y"],
+  y: ["x"],
+  "omega-ruby": ["alpha-sapphire"],
+  "alpha-sapphire": ["omega-ruby"],
+};
 const CONCURRENCY = 10;
 const MAX_RETRIES = 3;
 
@@ -133,6 +190,7 @@ interface PokeAPISpecies {
   id: number;
   name: string;
   names: { name: string; language: { name: string; url: string } }[];
+  evolves_from_species: { name: string; url: string } | null;
 }
 
 interface PokeAPIEncounterEntry {
@@ -231,22 +289,33 @@ function slugToDisplayName(slug: string): string {
 
 // ── Data fetching ──────────────────────────────────────────────────────
 
-async function fetchAllSpecies(): Promise<SpeciesRecord[]> {
+async function fetchAllSpecies(): Promise<{
+  species: SpeciesRecord[];
+  evolvesFrom: Map<number, number>;
+}> {
   console.log(`Fetching ${MAX_SPECIES_ID} species from PokeAPI...`);
   const ids = Array.from({ length: MAX_SPECIES_ID }, (_, i) => i + 1);
+  const evolvesFrom = new Map<number, number>();
 
   const species = await fetchBatch(ids, async (id) => {
     const data = await fetchJSON<PokeAPISpecies>(
       `${POKEAPI}/pokemon-species/${id}`,
     );
+    if (data.evolves_from_species) {
+      const parts = data.evolves_from_species.url.split("/").filter(Boolean);
+      const preEvoId = parseInt(parts[parts.length - 1]!);
+      evolvesFrom.set(data.id, preEvoId);
+    }
     const englishName = data.names.find((n) =>
       n.language.name === "en"
     )?.name ?? data.name;
     return { id: data.id, name: englishName, slug: data.name };
   });
 
-  console.log(`  ✓ Fetched ${species.length} species`);
-  return species;
+  console.log(
+    `  ✓ Fetched ${species.length} species (${evolvesFrom.size} evolution links)`,
+  );
+  return { species, evolvesFrom };
 }
 
 async function fetchAllEncounters(): Promise<
@@ -348,13 +417,44 @@ async function resolveAreaNames(
   return nameMap;
 }
 
+// ── Special-route helpers ─────────────────────────────────────────────
+
+function computeWildCatchable(
+  encounterMap: Map<string, Map<string, EncounterRecord[]>>,
+  apiSlug: string,
+  maxSpeciesId: number,
+): Set<number> {
+  const catchable = new Set<number>();
+  for (const [, versionEncounters] of encounterMap) {
+    let encounters = versionEncounters.get(apiSlug) ?? [];
+    if (encounters.length === 0 && ENCOUNTER_FALLBACKS[apiSlug]) {
+      encounters = versionEncounters.get(ENCOUNTER_FALLBACKS[apiSlug]) ?? [];
+    }
+    for (const enc of encounters) {
+      if (enc.speciesId <= maxSpeciesId) catchable.add(enc.speciesId);
+    }
+  }
+  return catchable;
+}
+
+function buildEvolvesInto(
+  evolvesFrom: Map<number, number>,
+): Map<number, number[]> {
+  const evolvesInto = new Map<number, number[]>();
+  for (const [speciesId, preEvoId] of evolvesFrom) {
+    if (!evolvesInto.has(preEvoId)) evolvesInto.set(preEvoId, []);
+    evolvesInto.get(preEvoId)!.push(speciesId);
+  }
+  return evolvesInto;
+}
+
 // ── Main seed ──────────────────────────────────────────────────────────
 
 async function main() {
   console.log("🌱 Starting seed (fetching from PokeAPI)...\n");
 
   // Fetch species and encounters in parallel
-  const [species, encounterMap] = await Promise.all([
+  const [{ species, evolvesFrom }, encounterMap] = await Promise.all([
     fetchAllSpecies(),
     fetchAllEncounters(),
   ]);
@@ -471,10 +571,145 @@ async function main() {
     }
   }
 
+  // ── 4. Special Routes (Starter, Evolution, Breed, Trade, Trade National)
+  console.log("\nCreating special routes...");
+  const evolvesInto = buildEvolvesInto(evolvesFrom);
+  let specialRouteCount = 0;
+  let specialEncounterCount = 0;
+
+  for (const cfg of GAMES) {
+    const gameInfo = gameRecords.get(cfg.apiSlug)!;
+    const wildCatchable = computeWildCatchable(
+      encounterMap,
+      cfg.apiSlug,
+      gameInfo.maxSpeciesId,
+    );
+    const starters = new Set(
+      (GAME_STARTERS[cfg.apiSlug] ?? []).filter(
+        (id) => id <= gameInfo.maxSpeciesId,
+      ),
+    );
+
+    // Obtainable = wild + starters, then expand with evolutions and breeds
+    const obtainable = new Set([...wildCatchable, ...starters]);
+
+    // Transitively add evolutions of obtainable Pokémon
+    const evolutionSet = new Set<number>();
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const id of [...obtainable]) {
+        for (const evoId of evolvesInto.get(id) ?? []) {
+          if (evoId <= gameInfo.maxSpeciesId && !obtainable.has(evoId)) {
+            obtainable.add(evoId);
+            evolutionSet.add(evoId);
+            changed = true;
+          }
+        }
+      }
+    }
+
+    // Transitively add pre-evolutions (breed) of obtainable Pokémon
+    const breedSet = new Set<number>();
+    changed = true;
+    while (changed) {
+      changed = false;
+      for (let id = 1; id <= gameInfo.maxSpeciesId; id++) {
+        if (obtainable.has(id)) continue;
+        const evoIds = evolvesInto.get(id) ?? [];
+        if (evoIds.some((evoId) => obtainable.has(evoId))) {
+          breedSet.add(id);
+          obtainable.add(id);
+          changed = true;
+        }
+      }
+    }
+
+    // Trade: wild-catchable in paired game(s) but not obtainable locally
+    const pairSlugs = GAME_PAIRS[cfg.apiSlug] ?? [];
+    const oppositeWild = new Set<number>();
+    for (const pairSlug of pairSlugs) {
+      for (
+        const id of computeWildCatchable(
+          encounterMap,
+          pairSlug,
+          gameInfo.maxSpeciesId,
+        )
+      ) {
+        oppositeWild.add(id);
+      }
+    }
+    const tradeSet = new Set<number>();
+    for (const id of oppositeWild) {
+      if (!obtainable.has(id)) tradeSet.add(id);
+    }
+
+    // Trade (National): everything else within maxSpeciesId
+    const tradeNationalSet = new Set<number>();
+    for (let id = 1; id <= gameInfo.maxSpeciesId; id++) {
+      if (!obtainable.has(id) && !tradeSet.has(id) && speciesIds.has(id)) {
+        tradeNationalSet.add(id);
+      }
+    }
+
+    // Helper to create a special route with its encounters
+    const createSpecialRoute = async (
+      name: string,
+      slug: string,
+      method: string,
+      memberIds: Set<number>,
+    ) => {
+      if (memberIds.size === 0) return;
+      const route = await prisma.route.upsert({
+        where: { slug_gameId: { slug, gameId: gameInfo.id } },
+        update: { name },
+        create: { name, slug, gameId: gameInfo.id },
+      });
+      specialRouteCount++;
+      for (const speciesId of memberIds) {
+        await prisma.encounter.upsert({
+          where: {
+            routeId_speciesId_method: {
+              routeId: route.id,
+              speciesId,
+              method,
+            },
+          },
+          update: {},
+          create: { routeId: route.id, speciesId, method },
+        });
+        specialEncounterCount++;
+      }
+    };
+
+    await createSpecialRoute("Starter", "starter", "starter", starters);
+    await createSpecialRoute(
+      "Evolution",
+      "evolution",
+      "evolution",
+      evolutionSet,
+    );
+    await createSpecialRoute("Breed", "breed", "breed", breedSet);
+    await createSpecialRoute("Trade", "trade", "trade", tradeSet);
+    await createSpecialRoute(
+      "Trade (National)",
+      "trade-national",
+      "trade",
+      tradeNationalSet,
+    );
+
+    console.log(
+      `  ✓ ${cfg.name}: starter=${starters.size} evolution=${evolutionSet.size} ` +
+        `breed=${breedSet.size} trade=${tradeSet.size} national=${tradeNationalSet.size}`,
+    );
+  }
+
   console.log(`\n✅ Seed complete!`);
-  console.log(`   Routes seeded: ${routeCount}`);
+  console.log(`   Routes seeded: ${routeCount} + ${specialRouteCount} special`);
   console.log(`   Species seeded: ${species.length}`);
-  console.log(`   Encounters seeded: ${encounterCount}`);
+  console.log(
+    `   Encounters seeded: ${encounterCount} + ${specialEncounterCount} special`,
+  );
 }
 
 main()
