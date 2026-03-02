@@ -102,32 +102,8 @@ const GAMES: GameConfig[] = [
     apiSlug: "alpha-sapphire",
     maxSpeciesId: 721,
   },
-  // Gen 7
-  { name: "Sun", dbSlug: "sun", apiSlug: "sun", maxSpeciesId: 809 },
-  { name: "Moon", dbSlug: "moon", apiSlug: "moon", maxSpeciesId: 809 },
-  {
-    name: "Ultra Sun",
-    dbSlug: "ultra-sun",
-    apiSlug: "ultra-sun",
-    maxSpeciesId: 809,
-  },
-  {
-    name: "Ultra Moon",
-    dbSlug: "ultra-moon",
-    apiSlug: "ultra-moon",
-    maxSpeciesId: 809,
-  },
-  // Gen 8
-  { name: "Sword", dbSlug: "sword", apiSlug: "sword", maxSpeciesId: 898 },
-  { name: "Shield", dbSlug: "shield", apiSlug: "shield", maxSpeciesId: 898 },
-  // Gen 9
-  {
-    name: "Scarlet",
-    dbSlug: "scarlet",
-    apiSlug: "scarlet",
-    maxSpeciesId: 1025,
-  },
-  { name: "Violet", dbSlug: "violet", apiSlug: "violet", maxSpeciesId: 1025 },
+  // Gen 7–9 omitted: PokeAPI has no encounter/location-area data for these
+  // games. They can be added back once a data source is available.
 ];
 
 const ALL_API_SLUGS = new Set(GAMES.map((g) => g.apiSlug));
@@ -140,7 +116,15 @@ const VALID_METHODS = new Set([
   "super-rod",
   "rock-smash",
   "headbutt",
+  "horde",
 ]);
+// Fallback mapping for remakes whose PokeAPI encounter data is incomplete.
+// ORAS only has horde/devon-scope encounters in PokeAPI; fall back to
+// Ruby/Sapphire which share the same locations and standard encounters.
+const ENCOUNTER_FALLBACKS: Record<string, string> = {
+  "omega-ruby": "ruby",
+  "alpha-sapphire": "sapphire",
+};
 const CONCURRENCY = 10;
 const MAX_RETRIES = 3;
 
@@ -430,7 +414,12 @@ async function main() {
 
   for (const routeData of routes) {
     for (const [apiSlug, gameInfo] of gameRecords) {
-      const versionEncounters = routeData.encounters.get(apiSlug) ?? [];
+      let versionEncounters = routeData.encounters.get(apiSlug) ?? [];
+      // Fall back to source game encounters for remakes with incomplete data
+      if (versionEncounters.length === 0 && ENCOUNTER_FALLBACKS[apiSlug]) {
+        versionEncounters =
+          routeData.encounters.get(ENCOUNTER_FALLBACKS[apiSlug]) ?? [];
+      }
       if (versionEncounters.length === 0) continue;
 
       // Filter encounters to species within this game's generation
