@@ -11,6 +11,7 @@ import {
   Menu,
   NavLink,
   NavLinkProps,
+  Progress,
   ScrollArea,
   Stack,
   UnstyledButton,
@@ -263,14 +264,22 @@ function SaveGameNavLinks(
     return null;
   }
 
+  const calcPct = (caught: number, total: number) =>
+    total > 0 ? Math.round((caught / total) * 100) : 0;
+
   return (
     <Stack gap={0}>
-      {data.map((item) =>
-        item.kind === "single"
-          ? (
+      {data.map((item) => {
+        if (item.kind === "single") {
+          const pct = calcPct(
+            item.route.caughtCount,
+            item.route.totalSpecies,
+          );
+          return (
             <NavLink
               key={item.route.id}
               label={item.route.name}
+              description={<Progress value={pct} size="xs" />}
               component={Link}
               to="/saves/$saveId/routes/$routeId"
               onClick={onClick}
@@ -279,35 +288,50 @@ function SaveGameNavLinks(
                 routeId: item.route.id,
               }}
             />
-          )
-          : (
-            <NavLink
-              key={item.baseName}
-              label={item.baseName}
-              childrenOffset={16}
-            >
-              {item.routes.map((route) => {
-                const suffix = route.name === item.baseName
-                  ? (BASE_NAME_FALLBACK_LABELS[item.baseName] ?? item.baseName)
-                  : route.name.replace(item.baseName, "").trim()
-                    .replace(/^\(/, "").replace(/\)$/, "");
-                return (
-                  <NavLink
-                    key={route.id}
-                    label={suffix}
-                    component={Link}
-                    to="/saves/$saveId/routes/$routeId"
-                    onClick={onClick}
-                    params={{
-                      saveId: save.id,
-                      routeId: route.id,
-                    }}
-                  />
-                );
-              })}
-            </NavLink>
-          )
-      )}
+          );
+        }
+
+        const groupTotal = item.routes.reduce(
+          (sum, r) => sum + r.totalSpecies,
+          0,
+        );
+        const groupCaught = item.routes.reduce(
+          (sum, r) => sum + r.caughtCount,
+          0,
+        );
+        const groupPct = calcPct(groupCaught, groupTotal);
+
+        return (
+          <NavLink
+            key={item.baseName}
+            label={item.baseName}
+            description={<Progress value={groupPct} size="xs" />}
+            childrenOffset={16}
+          >
+            {item.routes.map((route) => {
+              const suffix = route.name === item.baseName
+                ? (BASE_NAME_FALLBACK_LABELS[item.baseName] ?? item.baseName)
+                : route.name.replace(item.baseName, "").trim()
+                  .replace(/^\(/, "").replace(/\)$/, "");
+              const pct = calcPct(route.caughtCount, route.totalSpecies);
+              return (
+                <NavLink
+                  key={route.id}
+                  label={suffix}
+                  description={<Progress value={pct} size="xs" />}
+                  component={Link}
+                  to="/saves/$saveId/routes/$routeId"
+                  onClick={onClick}
+                  params={{
+                    saveId: save.id,
+                    routeId: route.id,
+                  }}
+                />
+              );
+            })}
+          </NavLink>
+        );
+      })}
     </Stack>
   );
 }
