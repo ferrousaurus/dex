@@ -63,7 +63,13 @@ function CreateSaveModal({
 
   return (
     <Modal opened={opened} onClose={onClose} title="New Save">
-      <Stack>
+      <Stack
+        component="form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          mutate();
+        }}
+      >
         <TextInput
           size="md"
           label="Save name"
@@ -81,7 +87,7 @@ function CreateSaveModal({
           data={games.map((g) => ({ value: String(g.id), label: g.name }))}
         />
         <Button
-          onClick={() => mutate()}
+          type="submit"
           disabled={!canSubmit}
           loading={isPending}
         >
@@ -303,7 +309,7 @@ export default function HomePage() {
       )}
 
       {saves.length > 0 && (
-        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
+        <SimpleGrid cols={2}>
           {saves.map((save) => (
             <SaveCard
               key={save.id}

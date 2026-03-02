@@ -14,10 +14,11 @@ import {
 } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import getSave from "../../server/saves/getSave.ts";
 import getRoutes from "../../server/routes/getRoutes.ts";
+import { BASE_NAME_FALLBACK_LABELS, groupRoutes } from "@/lib/groupRoutes.ts";
 import { useParams } from "@tanstack/react-router";
 
 export type ShellProps = PropsWithChildren;
@@ -29,33 +30,23 @@ export default function Shell({ children }: Readonly<ShellProps>) {
   const { data: session } = auth.useSession();
   const [opened, { toggle }] = useDisclosure(false);
 
-  const { data: saves = [] } = useQuery({
-    queryKey: ["saves"],
-    queryFn: () => getSaves(),
-  });
-
-  const savesByGameId = new Map<number, Save[]>();
-  for (const save of saves) {
-    savesByGameId.set(save.gameId, savesByGameId.get(save.gameId) ?? []);
-  }
-
   return (
     <AppShell
       padding="md"
       header={{ height: 48 }}
       navbar={params.saveId !== undefined && session !== undefined
-        ? { width: 260, breakpoint: "sm", collapsed: { mobile: !opened } }
+        ? {
+          width: 260,
+          breakpoint: "sm",
+          collapsed: { mobile: !opened },
+        }
         : undefined}
     >
       <AppShell.Header px="md">
         <Group justify="space-between" align="center" h="100%">
           <Group align="center" gap="sm">
             {params.saveId !== undefined && (
-              <Burger
-                opened={opened}
-                onClick={toggle}
-                hiddenFrom="sm"
-              />
+              <Burger opened={opened} onClick={toggle} hiddenFrom="sm" />
             )}
             <Button variant="transparent" component={Link} to="/" size="sm">
               DexNav
@@ -163,6 +154,7 @@ function SaveGameNavLinks({ save }: { save: Save }) {
           saveId: save.id,
         },
       }),
+    select: groupRoutes,
   });
 
   if (isPending) {
@@ -174,19 +166,48 @@ function SaveGameNavLinks({ save }: { save: Save }) {
   }
 
   return (
-    <Stack>
-      {data.map((route) => (
-        <NavLink
-          key={route.id}
-          label={route.name}
-          component={Link}
-          to="/saves/$saveId/routes/$routeId"
-          params={{
-            saveId: save.id,
-            routeId: route.id,
-          }}
-        />
-      ))}
+    <Stack gap={0}>
+      {data.map((item) =>
+        item.kind === "single"
+          ? (
+            <NavLink
+              key={item.route.id}
+              label={item.route.name}
+              component={Link}
+              to="/saves/$saveId/routes/$routeId"
+              params={{
+                saveId: save.id,
+                routeId: item.route.id,
+              }}
+            />
+          )
+          : (
+            <NavLink
+              key={item.baseName}
+              label={item.baseName}
+              childrenOffset={16}
+            >
+              {item.routes.map((route) => {
+                const suffix = route.name === item.baseName
+                  ? (BASE_NAME_FALLBACK_LABELS[item.baseName] ?? item.baseName)
+                  : route.name.replace(item.baseName, "").trim()
+                    .replace(/^\(/, "").replace(/\)$/, "");
+                return (
+                  <NavLink
+                    key={route.id}
+                    label={suffix}
+                    component={Link}
+                    to="/saves/$saveId/routes/$routeId"
+                    params={{
+                      saveId: save.id,
+                      routeId: route.id,
+                    }}
+                  />
+                );
+              })}
+            </NavLink>
+          )
+      )}
     </Stack>
   );
 }
