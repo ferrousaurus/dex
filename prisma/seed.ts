@@ -303,7 +303,7 @@ async function fetchAllSpecies(): Promise<{
     );
     if (data.evolves_from_species) {
       const parts = data.evolves_from_species.url.split("/").filter(Boolean);
-      const preEvoId = parseInt(parts[parts.length - 1]);
+      const preEvoId = parseInt(parts[parts.length - 1]!);
       evolvesFrom.set(data.id, preEvoId);
     }
     const englishName = data.names.find((n) =>
