@@ -109,7 +109,7 @@ function PokemonCard({
               caught ? theme.colors.green[6] : theme.colors.gray[3]
             }`,
             background: caught ? theme.colors.green[0] : theme.colors.gray[0],
-            opacity: caught ? 1 : 0.5,
+            opacity: caught ? 1 : 0.7,
             transition: "all 0.15s ease",
             position: "relative",
             cursor: isPending ? "wait" : "pointer",
@@ -137,7 +137,11 @@ function PokemonCard({
                 w={64}
                 h={64}
                 mx="auto"
-                style={{ imageRendering: "pixelated" }}
+                style={{
+                  imageRendering: "pixelated",
+                  filter: caught ? "none" : "brightness(0)",
+                  transition: "filter 0.15s ease",
+                }}
               />
             )
             : <Box w={64} h={64} mx="auto" />}
