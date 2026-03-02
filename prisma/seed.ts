@@ -51,6 +51,83 @@ const GAMES: GameConfig[] = [
     apiSlug: "leafgreen",
     maxSpeciesId: 386,
   },
+  // Gen 4
+  { name: "Diamond", dbSlug: "diamond", apiSlug: "diamond", maxSpeciesId: 493 },
+  { name: "Pearl", dbSlug: "pearl", apiSlug: "pearl", maxSpeciesId: 493 },
+  {
+    name: "Platinum",
+    dbSlug: "platinum",
+    apiSlug: "platinum",
+    maxSpeciesId: 493,
+  },
+  {
+    name: "HeartGold",
+    dbSlug: "heart-gold",
+    apiSlug: "heartgold",
+    maxSpeciesId: 493,
+  },
+  {
+    name: "SoulSilver",
+    dbSlug: "soul-silver",
+    apiSlug: "soulsilver",
+    maxSpeciesId: 493,
+  },
+  // Gen 5
+  { name: "Black", dbSlug: "black", apiSlug: "black", maxSpeciesId: 649 },
+  { name: "White", dbSlug: "white", apiSlug: "white", maxSpeciesId: 649 },
+  {
+    name: "Black 2",
+    dbSlug: "black-2",
+    apiSlug: "black-2",
+    maxSpeciesId: 649,
+  },
+  {
+    name: "White 2",
+    dbSlug: "white-2",
+    apiSlug: "white-2",
+    maxSpeciesId: 649,
+  },
+  // Gen 6
+  { name: "X", dbSlug: "x", apiSlug: "x", maxSpeciesId: 721 },
+  { name: "Y", dbSlug: "y", apiSlug: "y", maxSpeciesId: 721 },
+  {
+    name: "Omega Ruby",
+    dbSlug: "omega-ruby",
+    apiSlug: "omega-ruby",
+    maxSpeciesId: 721,
+  },
+  {
+    name: "Alpha Sapphire",
+    dbSlug: "alpha-sapphire",
+    apiSlug: "alpha-sapphire",
+    maxSpeciesId: 721,
+  },
+  // Gen 7
+  { name: "Sun", dbSlug: "sun", apiSlug: "sun", maxSpeciesId: 809 },
+  { name: "Moon", dbSlug: "moon", apiSlug: "moon", maxSpeciesId: 809 },
+  {
+    name: "Ultra Sun",
+    dbSlug: "ultra-sun",
+    apiSlug: "ultra-sun",
+    maxSpeciesId: 809,
+  },
+  {
+    name: "Ultra Moon",
+    dbSlug: "ultra-moon",
+    apiSlug: "ultra-moon",
+    maxSpeciesId: 809,
+  },
+  // Gen 8
+  { name: "Sword", dbSlug: "sword", apiSlug: "sword", maxSpeciesId: 898 },
+  { name: "Shield", dbSlug: "shield", apiSlug: "shield", maxSpeciesId: 898 },
+  // Gen 9
+  {
+    name: "Scarlet",
+    dbSlug: "scarlet",
+    apiSlug: "scarlet",
+    maxSpeciesId: 1025,
+  },
+  { name: "Violet", dbSlug: "violet", apiSlug: "violet", maxSpeciesId: 1025 },
 ];
 
 const ALL_API_SLUGS = new Set(GAMES.map((g) => g.apiSlug));
