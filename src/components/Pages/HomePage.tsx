@@ -65,7 +65,7 @@ function CreateSaveModal({
     <Modal opened={opened} onClose={onClose} title="New Save">
       <Stack>
         <TextInput
-          size="sm"
+          size="md"
           label="Save name"
           placeholder="My FireRed Run"
           value={name}
@@ -73,7 +73,7 @@ function CreateSaveModal({
           data-autofocus
         />
         <Select
-          size="sm"
+          size="md"
           label="Game"
           placeholder="Select a game"
           value={gameId}
