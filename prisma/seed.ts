@@ -140,7 +140,15 @@ const VALID_METHODS = new Set([
   "super-rod",
   "rock-smash",
   "headbutt",
+  "horde",
 ]);
+// Fallback mapping for remakes whose PokeAPI encounter data is incomplete.
+// ORAS only has horde/devon-scope encounters in PokeAPI; fall back to
+// Ruby/Sapphire which share the same locations and standard encounters.
+const ENCOUNTER_FALLBACKS: Record<string, string> = {
+  "omega-ruby": "ruby",
+  "alpha-sapphire": "sapphire",
+};
 const CONCURRENCY = 10;
 const MAX_RETRIES = 3;
 
@@ -430,7 +438,12 @@ async function main() {
 
   for (const routeData of routes) {
     for (const [apiSlug, gameInfo] of gameRecords) {
-      const versionEncounters = routeData.encounters.get(apiSlug) ?? [];
+      let versionEncounters = routeData.encounters.get(apiSlug) ?? [];
+      // Fall back to source game encounters for remakes with incomplete data
+      if (versionEncounters.length === 0 && ENCOUNTER_FALLBACKS[apiSlug]) {
+        versionEncounters =
+          routeData.encounters.get(ENCOUNTER_FALLBACKS[apiSlug]) ?? [];
+      }
       if (versionEncounters.length === 0) continue;
 
       // Filter encounters to species within this game's generation
