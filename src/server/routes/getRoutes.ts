@@ -32,7 +32,15 @@ const getRoutes = createServerFn({ method: "GET" })
 
     const caughtSet = new Set(caughtStatuses.map((cs) => cs.speciesId));
 
-    return routes.map((route) => {
+    const specialSlugs = [
+      "starter",
+      "evolution",
+      "breed",
+      "trade",
+      "trade-national",
+    ];
+
+    const mapped = routes.map((route) => {
       const speciesIds = route.encounters.map((e) => e.speciesId);
       const uniqueSpeciesIds = [...new Set(speciesIds)];
       const caughtCount = uniqueSpeciesIds.filter((id) =>
@@ -46,6 +54,38 @@ const getRoutes = createServerFn({ method: "GET" })
         caughtCount,
       };
     });
+
+    // Natural sort: split into text/number segments and compare pairwise
+    const naturalCompare = (a: string, b: string): number => {
+      const aParts = a.split(/(\d+)/);
+      const bParts = b.split(/(\d+)/);
+      for (let i = 0; i < Math.min(aParts.length, bParts.length); i++) {
+        const ap = aParts[i];
+        const bp = bParts[i];
+        if (ap === bp) continue;
+        const aNum = Number(ap);
+        const bNum = Number(bp);
+        if (!isNaN(aNum) && !isNaN(bNum)) return aNum - bNum;
+        return ap.localeCompare(bp);
+      }
+      return aParts.length - bParts.length;
+    };
+
+    mapped.sort((a, b) => {
+      const aSpecial = specialSlugs.indexOf(a.slug);
+      const bSpecial = specialSlugs.indexOf(b.slug);
+      const aIsSpecial = aSpecial !== -1;
+      const bIsSpecial = bSpecial !== -1;
+
+      // Special routes go to the bottom
+      if (aIsSpecial && !bIsSpecial) return 1;
+      if (!aIsSpecial && bIsSpecial) return -1;
+      if (aIsSpecial && bIsSpecial) return aSpecial - bSpecial;
+
+      return naturalCompare(a.name, b.name);
+    });
+
+    return mapped;
   });
 
 export default getRoutes;
