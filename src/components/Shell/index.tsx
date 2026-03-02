@@ -148,59 +148,57 @@ export default function Shell({ children }: Readonly<ShellProps>) {
             Your Saves
           </Text>
         </AppShell.Section>
-        <AppShell.Section grow mt="sm">
-          <ScrollArea type="hover">
-            <Stack gap="xs">
-              {isLoadingGames && (
-                <Text size="sm" c="dimmed">
-                  Loading games...
-                </Text>
-              )}
-              {!isLoadingGames && games.length === 0 && (
-                <Text size="sm" c="dimmed">
-                  No games available.
-                </Text>
-              )}
-              {isLoadingSaves && (
-                <Text size="sm" c="dimmed">
-                  Loading saves...
-                </Text>
-              )}
-              {games.map((game) => {
-                const gameSaves = savesByGameId.get(game.id) ?? [];
-                return (
-                  <NavLink
-                    key={game.id}
-                    label={game.name}
-                    childrenOffset="md"
-                    defaultOpened={game.id === currentSaveGameId}
-                  >
-                    {gameSaves.map((save) => (
-                      <NavLink
-                        key={save.id}
-                        label={save.name}
-                        component={Link}
-                        to={`/saves/${save.id}`}
-                        onClick={close}
-                      />
-                    ))}
-                    {session !== null && (
-                      <NavLink
-                        label="New"
-                        rightSection={<PencilIcon size={12} />}
-                        mt="xs"
-                        onClick={() => {
-                          setCreateGameId(game.id);
-                          setCreateName("");
-                          openCreate();
-                        }}
-                      />
-                    )}
-                  </NavLink>
-                );
-              })}
-            </Stack>
-          </ScrollArea>
+        <AppShell.Section grow mt="sm" component={ScrollArea} type="hover">
+          <Stack gap="xs">
+            {isLoadingGames && (
+              <Text size="sm" c="dimmed">
+                Loading games...
+              </Text>
+            )}
+            {!isLoadingGames && games.length === 0 && (
+              <Text size="sm" c="dimmed">
+                No games available.
+              </Text>
+            )}
+            {isLoadingSaves && (
+              <Text size="sm" c="dimmed">
+                Loading saves...
+              </Text>
+            )}
+            {games.map((game) => {
+              const gameSaves = savesByGameId.get(game.id) ?? [];
+              return (
+                <NavLink
+                  key={game.id}
+                  label={game.name}
+                  childrenOffset="md"
+                  defaultOpened={game.id === currentSaveGameId}
+                >
+                  {gameSaves.map((save) => (
+                    <NavLink
+                      key={save.id}
+                      label={save.name}
+                      component={Link}
+                      to={`/saves/${save.id}`}
+                      onClick={close}
+                    />
+                  ))}
+                  {session !== null && (
+                    <NavLink
+                      label="New"
+                      rightSection={<PencilIcon size={12} />}
+                      mt="xs"
+                      onClick={() => {
+                        setCreateGameId(game.id);
+                        setCreateName("");
+                        openCreate();
+                      }}
+                    />
+                  )}
+                </NavLink>
+              );
+            })}
+          </Stack>
         </AppShell.Section>
       </AppShell.Navbar>
 
