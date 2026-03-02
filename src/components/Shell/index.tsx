@@ -25,6 +25,7 @@ export type ShellProps = PropsWithChildren;
 type Save = Awaited<ReturnType<typeof getSaves>>[number];
 
 export default function Shell({ children }: Readonly<ShellProps>) {
+  const params = useParams({ strict: false });
   const { data: session } = auth.useSession();
   const [opened, { toggle }] = useDisclosure(false);
 
@@ -42,18 +43,20 @@ export default function Shell({ children }: Readonly<ShellProps>) {
     <AppShell
       padding="md"
       header={{ height: 48 }}
-      navbar={session !== undefined
+      navbar={params.saveId !== undefined && session !== undefined
         ? { width: 260, breakpoint: "sm", collapsed: { mobile: !opened } }
         : undefined}
     >
       <AppShell.Header px="md">
         <Group justify="space-between" align="center" h="100%">
           <Group align="center" gap="sm">
-            <Burger
-              opened={opened}
-              onClick={toggle}
-              hiddenFrom="sm"
-            />
+            {params.saveId !== undefined && (
+              <Burger
+                opened={opened}
+                onClick={toggle}
+                hiddenFrom="sm"
+              />
+            )}
             <Button variant="transparent" component={Link} to="/" size="sm">
               DexNav
             </Button>
