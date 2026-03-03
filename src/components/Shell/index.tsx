@@ -122,7 +122,7 @@ function SaveBreadcrumb({ saveId }: { saveId: string }) {
       <Anchor
         component={Link}
         to="/saves/$saveId"
-        params={{ saveId }}
+        params={{ saveId } as never}
         visibleFrom="md"
       >
         {data?.name ?? "Save"}
@@ -130,7 +130,7 @@ function SaveBreadcrumb({ saveId }: { saveId: string }) {
       <Anchor
         component={Link}
         to="/saves/$saveId"
-        params={{ saveId }}
+        params={{ saveId } as never}
         hiddenFrom="md"
       >
         Save
@@ -144,7 +144,7 @@ function RoutesBreadcrumb({ saveId }: { saveId: string }) {
     <Anchor
       component={Link}
       to="/saves/$saveId/routes"
-      params={{ saveId }}
+      params={{ saveId } as never}
     >
       Routes
     </Anchor>
@@ -164,7 +164,7 @@ function RouteBreadcrumb(
       <Anchor
         component={Link}
         to="/saves/$saveId/routes/$routeId"
-        params={{ saveId, routeId }}
+        params={{ saveId, routeId } as never}
         hiddenFrom="md"
       >
         Route
@@ -172,7 +172,7 @@ function RouteBreadcrumb(
       <Anchor
         component={Link}
         to="/saves/$saveId/routes/$routeId"
-        params={{ saveId, routeId }}
+        params={{ saveId, routeId } as never}
         visibleFrom="md"
       >
         {!isSuccess ? `Route ${routeId}` : data.name}
@@ -287,7 +287,7 @@ function SaveGameNavLinks(
               params={{
                 saveId: save.id,
                 routeId: item.route.id,
-              }}
+              } as never}
             />
           )
           : (
@@ -320,7 +320,7 @@ function SaveGameNavLinks(
                     params={{
                       saveId: save.id,
                       routeId: route.id,
-                    }}
+                    } as never}
                   />
                 );
               })}

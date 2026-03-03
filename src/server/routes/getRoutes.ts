@@ -60,8 +60,8 @@ const getRoutes = createServerFn({ method: "GET" })
       const aParts = a.split(/(\d+)/);
       const bParts = b.split(/(\d+)/);
       for (let i = 0; i < Math.min(aParts.length, bParts.length); i++) {
-        const ap = aParts[i];
-        const bp = bParts[i];
+        const ap = aParts[i] ?? "";
+        const bp = bParts[i] ?? "";
         if (ap === bp) continue;
         const aNum = Number(ap);
         const bNum = Number(bp);

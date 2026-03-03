@@ -215,7 +215,10 @@ export type SaveRoutePageProps = {
 export default function SaveRoutePage(
   { routeId, saveId }: Readonly<SaveRoutePageProps>,
 ) {
-  const { save, routes } = SaveRoute.useLoaderData();
+  const { save, routes } = SaveRoute.useLoaderData() as {
+    save: Save;
+    routes: RouteEntry[];
+  };
 
   const navigate = useNavigate();
 
