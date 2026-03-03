@@ -5,6 +5,7 @@ import {
   Anchor,
   AppShell,
   Avatar,
+  Badge,
   Breadcrumbs,
   Burger,
   Group,
@@ -271,6 +272,11 @@ function SaveGameNavLinks(
             <NavLink
               key={item.route.id}
               label={item.route.name}
+              rightSection={
+                <Badge size="xs" variant="light">
+                  {item.route.caughtCount}/{item.route.totalSpecies}
+                </Badge>
+              }
               component={Link}
               to="/saves/$saveId/routes/$routeId"
               onClick={onClick}
@@ -295,6 +301,11 @@ function SaveGameNavLinks(
                   <NavLink
                     key={route.id}
                     label={suffix}
+                    rightSection={
+                      <Badge size="xs" variant="light">
+                        {route.caughtCount}/{route.totalSpecies}
+                      </Badge>
+                    }
                     component={Link}
                     to="/saves/$saveId/routes/$routeId"
                     onClick={onClick}
