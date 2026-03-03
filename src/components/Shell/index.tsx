@@ -273,7 +273,11 @@ function SaveGameNavLinks(
               key={item.route.id}
               label={item.route.name}
               rightSection={
-                <Badge size="xs" variant="light">
+                <Badge
+                  size="xs"
+                  variant="light"
+                  aria-label={`${item.route.caughtCount} of ${item.route.totalSpecies} species caught`}
+                >
                   {item.route.caughtCount}/{item.route.totalSpecies}
                 </Badge>
               }
@@ -302,7 +306,11 @@ function SaveGameNavLinks(
                     key={route.id}
                     label={suffix}
                     rightSection={
-                      <Badge size="xs" variant="light">
+                      <Badge
+                        size="xs"
+                        variant="light"
+                        aria-label={`${route.caughtCount} of ${route.totalSpecies} species caught`}
+                      >
                         {route.caughtCount}/{route.totalSpecies}
                       </Badge>
                     }
