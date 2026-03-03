@@ -276,9 +276,8 @@ function SaveGameNavLinks(
                     ? "green"
                     : undefined}
                   value={Math.round(
-                    item.route.caughtCount / item.route.totalSpecies,
-                  ) *
-                    100}
+                    item.route.caughtCount / item.route.totalSpecies * 100,
+                  )}
                 />
               }
               to="/saves/$saveId/routes/$routeId"
@@ -297,8 +296,8 @@ function SaveGameNavLinks(
             >
               {item.routes.map((route) => {
                 const percent = Math.round(
-                  route.caughtCount / route.totalSpecies,
-                ) * 100;
+                  route.caughtCount / route.totalSpecies * 100,
+                );
 
                 const suffix = route.name === item.baseName
                   ? (BASE_NAME_FALLBACK_LABELS[item.baseName] ?? item.baseName)
