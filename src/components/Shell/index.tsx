@@ -5,13 +5,13 @@ import {
   Anchor,
   AppShell,
   Avatar,
-  Badge,
   Breadcrumbs,
   Burger,
   Group,
   Menu,
   NavLink,
   NavLinkProps,
+  Progress,
   ScrollArea,
   Stack,
   UnstyledButton,
@@ -272,14 +272,14 @@ function SaveGameNavLinks(
             <NavLink
               key={item.route.id}
               label={item.route.name}
-              rightSection={
-                <Badge
+              description={
+                <Progress
                   size="xs"
-                  variant="light"
+                  value={item.route.totalSpecies === 0
+                    ? 0
+                    : item.route.caughtCount / item.route.totalSpecies * 100}
                   aria-label={`${item.route.caughtCount} of ${item.route.totalSpecies} species caught`}
-                >
-                  {item.route.caughtCount}/{item.route.totalSpecies}
-                </Badge>
+                />
               }
               component={Link}
               to="/saves/$saveId/routes/$routeId"
@@ -305,14 +305,14 @@ function SaveGameNavLinks(
                   <NavLink
                     key={route.id}
                     label={suffix}
-                    rightSection={
-                      <Badge
+                    description={
+                      <Progress
                         size="xs"
-                        variant="light"
+                        value={route.totalSpecies === 0
+                          ? 0
+                          : route.caughtCount / route.totalSpecies * 100}
                         aria-label={`${route.caughtCount} of ${route.totalSpecies} species caught`}
-                      >
-                        {route.caughtCount}/{route.totalSpecies}
-                      </Badge>
+                      />
                     }
                     component={Link}
                     to="/saves/$saveId/routes/$routeId"
