@@ -122,7 +122,7 @@ function SaveBreadcrumb({ saveId }: { saveId: string }) {
       <Anchor
         component={Link}
         to="/saves/$saveId"
-        params={{ saveId } as never}
+        params={() => ({ saveId })}
         visibleFrom="md"
       >
         {data?.name ?? "Save"}
@@ -130,7 +130,7 @@ function SaveBreadcrumb({ saveId }: { saveId: string }) {
       <Anchor
         component={Link}
         to="/saves/$saveId"
-        params={{ saveId } as never}
+        params={() => ({ saveId })}
         hiddenFrom="md"
       >
         Save
@@ -144,7 +144,7 @@ function RoutesBreadcrumb({ saveId }: { saveId: string }) {
     <Anchor
       component={Link}
       to="/saves/$saveId/routes"
-      params={{ saveId } as never}
+      params={() => ({ saveId })}
     >
       Routes
     </Anchor>
@@ -164,7 +164,7 @@ function RouteBreadcrumb(
       <Anchor
         component={Link}
         to="/saves/$saveId/routes/$routeId"
-        params={{ saveId, routeId } as never}
+        params={() => ({ saveId, routeId })}
         hiddenFrom="md"
       >
         Route
@@ -172,7 +172,7 @@ function RouteBreadcrumb(
       <Anchor
         component={Link}
         to="/saves/$saveId/routes/$routeId"
-        params={{ saveId, routeId } as never}
+        params={() => ({ saveId, routeId })}
         visibleFrom="md"
       >
         {!isSuccess ? `Route ${routeId}` : data.name}
@@ -284,10 +284,10 @@ function SaveGameNavLinks(
               component={Link}
               to="/saves/$saveId/routes/$routeId"
               onClick={onClick}
-              params={{
-                saveId: save.id,
-                routeId: item.route.id,
-              } as never}
+              params={() => ({
+                saveId: String(save.id),
+                routeId: String(item.route.id),
+              })}
             />
           )
           : (
@@ -317,10 +317,10 @@ function SaveGameNavLinks(
                     component={Link}
                     to="/saves/$saveId/routes/$routeId"
                     onClick={onClick}
-                    params={{
-                      saveId: save.id,
-                      routeId: route.id,
-                    } as never}
+                    params={() => ({
+                      saveId: String(save.id),
+                      routeId: String(route.id),
+                    })}
                   />
                 );
               })}

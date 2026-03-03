@@ -2,6 +2,7 @@ import getRouteEncounters from "@/server/routes/getRouteEncounters.ts";
 import getRoutes from "@/server/routes/getRoutes.ts";
 import { getGameColor } from "@/lib/gameColors.ts";
 import getProgress from "@/server/saves/getProgress.ts";
+import getSave from "@/server/saves/getSave.ts";
 import toggleCaught from "@/server/encounters/toggleCaught.ts";
 import {
   Badge,
@@ -22,7 +23,6 @@ import {
 } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Route as SaveRoute } from "@/routes/saves/$saveId/index.tsx";
 import { CheckCircle } from "@phosphor-icons/react";
 import { Route, Save } from "../../../prisma/generated/client.ts";
 import { useNavigate } from "@tanstack/react-router";
@@ -215,10 +215,10 @@ export type SaveRoutePageProps = {
 export default function SaveRoutePage(
   { routeId, saveId }: Readonly<SaveRoutePageProps>,
 ) {
-  const { save, routes } = SaveRoute.useLoaderData() as {
-    save: Save;
-    routes: RouteEntry[];
-  };
+  const { data: save } = useQuery({
+    queryKey: ["saves", { saveId }],
+    queryFn: () => getSave({ data: { id: saveId } }),
+  });
 
   const navigate = useNavigate();
 
@@ -234,13 +234,19 @@ export default function SaveRoutePage(
   ] = useDisclosure(false);
 
   // Live route list (refetches after caught toggle)
-  const { data: liveRoutes = routes } = useQuery({
-    queryKey: ["routes", save.id],
-    queryFn: () =>
-      getRoutes({ data: { gameId: save.gameId, saveId: save.id } }),
-    initialData: routes,
+  const { data: liveRoutes = [] } = useQuery({
+    queryKey: ["routes", { saveId }],
+    queryFn: () => {
+      if (!save?.game) return [];
+      return getRoutes({ data: { gameId: save.game.id, saveId: save.id } });
+    },
+    enabled: !!save,
     staleTime: 0,
   });
+
+  if (!save || !save.game) {
+    return <Text c="dimmed">Loading save...</Text>;
+  }
 
   // Encounters for the selected route
   const { data: encounters = [], isLoading: encLoading } = useQuery({
