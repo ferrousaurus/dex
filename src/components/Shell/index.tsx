@@ -270,6 +270,9 @@ function SaveGameNavLinks(
               description={
                 <Progress
                   size="xs"
+                  color={item.route.caughtCount / item.route.totalSpecies === 1
+                    ? "green"
+                    : undefined}
                   value={(item.route.caughtCount / item.route.totalSpecies) *
                     100}
                 />
@@ -300,6 +303,9 @@ function SaveGameNavLinks(
                     description={
                       <Progress
                         size="xs"
+                        color={route.caughtCount / route.totalSpecies === 1
+                          ? "green"
+                          : undefined}
                         value={(route.caughtCount /
                           route.totalSpecies) * 100}
                       />
