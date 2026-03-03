@@ -109,7 +109,7 @@ function GroupedRouteCard({
             <Text size="sm" c="dimmed">
               {caughtCount}/{totalSpecies} caught
             </Text>
-            <Progress value={pct} />
+            <Progress value={pct} color={pct === 100 ? "green" : undefined} />
           </Stack>
         </Card>
       </Menu.Target>

@@ -270,10 +270,14 @@ function SaveGameNavLinks(
               description={
                 <Progress
                   size="xs"
-                  color={item.route.caughtCount / item.route.totalSpecies === 1
+                  color={Math.round(
+                      item.route.caughtCount / item.route.totalSpecies,
+                    ) === 1
                     ? "green"
                     : undefined}
-                  value={(item.route.caughtCount / item.route.totalSpecies) *
+                  value={Math.round(
+                    item.route.caughtCount / item.route.totalSpecies,
+                  ) *
                     100}
                 />
               }
@@ -292,10 +296,15 @@ function SaveGameNavLinks(
               childrenOffset={16}
             >
               {item.routes.map((route) => {
+                const percent = Math.round(
+                  route.caughtCount / route.totalSpecies,
+                ) * 100;
+
                 const suffix = route.name === item.baseName
                   ? (BASE_NAME_FALLBACK_LABELS[item.baseName] ?? item.baseName)
                   : route.name.replace(item.baseName, "").trim()
                     .replace(/^\(/, "").replace(/\)$/, "");
+
                 return (
                   <NavLink
                     key={route.id}
@@ -303,11 +312,8 @@ function SaveGameNavLinks(
                     description={
                       <Progress
                         size="xs"
-                        color={route.caughtCount / route.totalSpecies === 1
-                          ? "green"
-                          : undefined}
-                        value={(route.caughtCount /
-                          route.totalSpecies) * 100}
+                        color={percent === 100 ? "green" : undefined}
+                        value={percent}
                       />
                     }
                     to="/saves/$saveId/routes/$routeId"
