@@ -39,7 +39,7 @@ function RouteCard({
 }) {
   const navigate = useNavigate();
   const pct = route.totalSpecies > 0
-    ? Math.round((route.caughtCount / route.totalSpecies) * 100)
+    ? Math.round(route.caughtCount / route.totalSpecies * 100)
     : 0;
 
   return (
@@ -64,7 +64,7 @@ function RouteCard({
         <Text size="sm" c="dimmed">
           {route.caughtCount}/{route.totalSpecies} caught
         </Text>
-        <Progress value={pct} />
+        <Progress value={pct} color={pct === 100 ? "green" : undefined} />
       </Stack>
     </Card>
   );
@@ -87,7 +87,7 @@ function GroupedRouteCard({
   const totalSpecies = routes.reduce((sum, r) => sum + r.totalSpecies, 0);
   const caughtCount = routes.reduce((sum, r) => sum + r.caughtCount, 0);
   const pct = totalSpecies > 0
-    ? Math.round((caughtCount / totalSpecies) * 100)
+    ? Math.round(caughtCount / totalSpecies * 100)
     : 0;
 
   return (
