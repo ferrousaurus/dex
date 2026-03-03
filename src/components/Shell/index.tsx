@@ -2,22 +2,23 @@ import auth from "@/clients/auth.ts";
 import { BASE_NAME_FALLBACK_LABELS, groupRoutes } from "@/lib/groupRoutes.ts";
 import getSaves from "@/server/saves/getSaves.ts";
 import {
-  Anchor,
   AppShell,
   Avatar,
   Breadcrumbs,
   Burger,
   Group,
   Menu,
-  NavLink,
-  NavLinkProps,
+  NavLink as MantineNavLink,
+  Progress,
   ScrollArea,
   Stack,
   UnstyledButton,
 } from "@mantine/core";
+import Anchor from "@/components/Links/Anchor.tsx";
+import NavLink, { type NavLinkProps } from "@/components/Links/NavLink.tsx";
 import { useDisclosure } from "@mantine/hooks";
 import { useQuery } from "@tanstack/react-query";
-import { Link, useParams } from "@tanstack/react-router";
+import { useParams } from "@tanstack/react-router";
 import { PropsWithChildren } from "react";
 import getRoutes from "../../server/routes/getRoutes.ts";
 import getSave from "../../server/saves/getSave.ts";
@@ -119,7 +120,6 @@ function SaveBreadcrumb({ saveId }: { saveId: string }) {
   return (
     <>
       <Anchor
-        component={Link}
         to="/saves/$saveId"
         params={{ saveId }}
         visibleFrom="md"
@@ -127,7 +127,6 @@ function SaveBreadcrumb({ saveId }: { saveId: string }) {
         {data?.name ?? "Save"}
       </Anchor>
       <Anchor
-        component={Link}
         to="/saves/$saveId"
         params={{ saveId }}
         hiddenFrom="md"
@@ -141,7 +140,6 @@ function SaveBreadcrumb({ saveId }: { saveId: string }) {
 function RoutesBreadcrumb({ saveId }: { saveId: string }) {
   return (
     <Anchor
-      component={Link}
       to="/saves/$saveId/routes"
       params={{ saveId }}
     >
@@ -161,7 +159,6 @@ function RouteBreadcrumb(
   return (
     <>
       <Anchor
-        component={Link}
         to="/saves/$saveId/routes/$routeId"
         params={{ saveId, routeId }}
         hiddenFrom="md"
@@ -169,7 +166,6 @@ function RouteBreadcrumb(
         Route
       </Anchor>
       <Anchor
-        component={Link}
         to="/saves/$saveId/routes/$routeId"
         params={{ saveId, routeId }}
         visibleFrom="md"
@@ -186,7 +182,7 @@ function ShellBreadcrumbs() {
 
   return (
     <Breadcrumbs>
-      <Anchor component={Link} to="/" size="sm">
+      <Anchor to="/" size="sm">
         DexNav
       </Anchor>
       {params.saveId && <SaveBreadcrumb saveId={params.saveId} />}
@@ -271,17 +267,23 @@ function SaveGameNavLinks(
             <NavLink
               key={item.route.id}
               label={item.route.name}
-              component={Link}
+              description={
+                <Progress
+                  size="xs"
+                  value={(item.route.caughtCount / item.route.totalSpecies) *
+                    100}
+                />
+              }
               to="/saves/$saveId/routes/$routeId"
               onClick={onClick}
               params={{
-                saveId: save.id,
-                routeId: item.route.id,
+                saveId: String(save.id),
+                routeId: String(item.route.id),
               }}
             />
           )
           : (
-            <NavLink
+            <MantineNavLink
               key={item.baseName}
               label={item.baseName}
               childrenOffset={16}
@@ -295,17 +297,23 @@ function SaveGameNavLinks(
                   <NavLink
                     key={route.id}
                     label={suffix}
-                    component={Link}
+                    description={
+                      <Progress
+                        size="xs"
+                        value={(route.caughtCount /
+                          route.totalSpecies) * 100}
+                      />
+                    }
                     to="/saves/$saveId/routes/$routeId"
                     onClick={onClick}
                     params={{
-                      saveId: save.id,
-                      routeId: route.id,
+                      saveId: String(save.id),
+                      routeId: String(route.id),
                     }}
                   />
                 );
               })}
-            </NavLink>
+            </MantineNavLink>
           )
       )}
     </Stack>
