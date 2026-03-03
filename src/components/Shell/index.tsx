@@ -40,7 +40,7 @@ export default function Shell({ children }: Readonly<ShellProps>) {
       header={{ height: 48 }}
       navbar={params.saveId !== undefined && session !== undefined
         ? {
-          width: 260,
+          width: 320,
           breakpoint: "sm",
           collapsed: { mobile: !opened },
         }
