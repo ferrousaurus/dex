@@ -1,19 +1,10 @@
+import PokemonCard from "@/components/PokemonCard.tsx";
+import getRoute from "@/server/routes/getRoute.ts";
 import getRouteEncounters from "@/server/routes/getRouteEncounters.ts";
-import getProgress from "@/server/saves/getProgress.ts";
-import {
-  Box,
-  Group,
-  Progress,
-  SimpleGrid,
-  Stack,
-  Text,
-  Title,
-} from "@mantine/core";
+import { Group, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Route as PkRoute, Save } from "~/prisma/generated/client.ts";
-import PokemonCard from "@/components/PokemonCard.tsx";
-import getRoute from "@/server/routes/getRoute.ts";
 
 export const Route = createFileRoute("/saves/$saveId/routes/$routeId/")({
   component: () => {
@@ -63,40 +54,8 @@ function SaveRoutePage({ saveId, routeId }: Readonly<SaveRoutePage>) {
     staleTime: 0,
   });
 
-  // Overall progress
-  const { data: progress } = useQuery({
-    queryKey: ["progress", { saveId }],
-    queryFn: () => getProgress({ data: { saveId } }),
-    staleTime: 0,
-  });
-
-  const progressPct = progress && progress.totalSpecies > 0
-    ? Math.round((progress.caught / progress.totalSpecies) * 100)
-    : 0;
-
   return (
     <Stack>
-      {progress && (
-        <Box
-          p="md"
-          style={(theme) => ({
-            background: theme.colors.blue[0],
-            borderRadius: theme.radius.md,
-            border: `1px solid ${theme.colors.blue[3]}`,
-          })}
-        >
-          <Group justify="space-between" mb={4}>
-            <Text fw={600} size="sm">
-              Overall Progress
-            </Text>
-            <Text size="sm" c="dimmed">
-              {progress.caught}/{progress.totalSpecies} species caught
-            </Text>
-          </Group>
-          <Progress value={progressPct} color="blue" />
-        </Box>
-      )}
-
       {/* Route header */}
       {route && (
         <Group justify="space-between" align="center">

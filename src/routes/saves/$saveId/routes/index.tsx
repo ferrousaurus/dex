@@ -2,9 +2,19 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import getSave from "@/server/saves/getSave.ts";
 import getRoutes from "@/server/routes/getRoutes.ts";
-import { Card, Menu, Progress, SimpleGrid, Stack, Text } from "@mantine/core";
+import {
+  Card,
+  Group,
+  Menu,
+  Progress,
+  RingProgress,
+  SimpleGrid,
+  Stack,
+  Text,
+} from "@mantine/core";
 import { Save } from "~/prisma/generated/client.ts";
-import { BASE_NAME_FALLBACK_LABELS, groupRoutes } from "@/lib/groupRoutes.ts";
+import { groupRoutes } from "@/lib/groupRoutes.ts";
+import getProgress from "../../../../server/saves/getProgress.ts";
 
 export const Route = createFileRoute("/saves/$saveId/routes/")({
   component: () => {
@@ -38,16 +48,9 @@ function RouteCard({
   saveId: Save["id"];
 }) {
   const navigate = useNavigate();
-  const pct = route.totalSpecies > 0
-    ? Math.round(route.caughtCount / route.totalSpecies * 100)
-    : 0;
 
   return (
     <Card
-      shadow="sm"
-      padding="lg"
-      radius="md"
-      withBorder
       style={{ cursor: "pointer" }}
       onClick={() =>
         navigate({
@@ -55,23 +58,27 @@ function RouteCard({
           params: { saveId: String(saveId), routeId: String(route.id) },
         })}
     >
-      <Card.Section withBorder inheritPadding py="xs">
-        <Text fw={600} size="lg" truncate>
-          {route.name}
-        </Text>
-      </Card.Section>
-      <Stack mt="md" gap="xs">
-        <Text size="sm" c="dimmed">
-          {route.caughtCount}/{route.totalSpecies} caught
-        </Text>
-        <Progress value={pct} color={pct === 100 ? "green" : undefined} />
+      <Stack>
+        <Group justify="space-between">
+          <Text fw={600} size="lg" truncate>
+            {route.name}
+          </Text>
+          <Text size="sm" color="dimmed">
+            {route.caughtCount}/{route.totalSpecies} caught
+          </Text>
+        </Group>
+        <Progress
+          value={Math.round(route.caughtCount / route.totalSpecies * 100)}
+          color={Math.round(
+              route.caughtCount / route.totalSpecies * 100,
+            ) ===
+              100
+            ? "green"
+            : undefined}
+        />
       </Stack>
     </Card>
   );
-}
-
-function stripParens(s: string): string {
-  return s.replace(/^\(/, "").replace(/\)$/, "");
 }
 
 function GroupedRouteCard({
@@ -86,54 +93,65 @@ function GroupedRouteCard({
   const navigate = useNavigate();
   const totalSpecies = routes.reduce((sum, r) => sum + r.totalSpecies, 0);
   const caughtCount = routes.reduce((sum, r) => sum + r.caughtCount, 0);
-  const pct = totalSpecies > 0
-    ? Math.round(caughtCount / totalSpecies * 100)
-    : 0;
 
   return (
     <Menu position="bottom-start" withArrow>
       <Menu.Target>
         <Card
-          shadow="sm"
-          padding="lg"
-          radius="md"
-          withBorder
           style={{ cursor: "pointer" }}
         >
-          <Card.Section withBorder inheritPadding py="xs">
-            <Text fw={600} size="lg" truncate>
-              {baseName}
-            </Text>
-          </Card.Section>
-          <Stack mt="md" gap="xs">
-            <Text size="sm" c="dimmed">
-              {caughtCount}/{totalSpecies} caught
-            </Text>
-            <Progress value={pct} color={pct === 100 ? "green" : undefined} />
+          <Stack>
+            <Group justify="space-between">
+              <Text fw={600} size="lg" truncate>
+                {baseName}
+              </Text>
+              <Text size="sm" color="dimmed">
+                {caughtCount} / {totalSpecies} caught
+              </Text>
+            </Group>
+            <Progress
+              value={Math.round(caughtCount / totalSpecies * 100)}
+              color={Math.round(
+                  caughtCount / totalSpecies * 100,
+                ) ===
+                  100
+                ? "green"
+                : undefined}
+            />
           </Stack>
         </Card>
       </Menu.Target>
       <Menu.Dropdown>
-        {routes.map((route) => {
-          const suffix = route.name === baseName
-            ? (BASE_NAME_FALLBACK_LABELS[baseName] ?? baseName)
-            : stripParens(route.name.replace(baseName, "").trim());
-          return (
-            <Menu.Item
-              key={route.id}
-              onClick={() =>
-                navigate({
-                  to: "/saves/$saveId/routes/$routeId",
-                  params: {
-                    saveId: String(saveId),
-                    routeId: String(route.id),
-                  },
-                })}
-            >
-              {suffix}
-            </Menu.Item>
-          );
-        })}
+        {routes.map((route) => (
+          <Menu.Item
+            key={route.id}
+            leftSection={
+              <RingProgress
+                size={32}
+                thickness={8}
+                sections={[{
+                  color: Math.round(
+                      caughtCount / totalSpecies * 100,
+                    ) ===
+                      100
+                    ? "green"
+                    : "blue",
+                  value: Math.round(caughtCount / totalSpecies * 100),
+                }]}
+              />
+            }
+            onClick={() =>
+              navigate({
+                to: "/saves/$saveId/routes/$routeId",
+                params: {
+                  saveId: String(saveId),
+                  routeId: String(route.id),
+                },
+              })}
+          >
+            {route.name}
+          </Menu.Item>
+        ))}
       </Menu.Dropdown>
     </Menu>
   );
@@ -152,32 +170,65 @@ function SaveRoutesPage({ saveId }: Readonly<SavePageProps>) {
     select: groupRoutes,
   });
 
+  const { data: progress } = useQuery({
+    queryKey: ["progress", { saveId }],
+    queryFn: () => getProgress({ data: { saveId } }),
+    staleTime: 0,
+  });
+
   if (!save || isLoading) {
     return <Text c="dimmed">Loading routes...</Text>;
   }
 
   if (routes.length === 0) {
     return (
-      <Card withBorder p="xl" ta="center">
+      <Card>
         <Text c="dimmed">No routes found for this game.</Text>
       </Card>
     );
   }
 
+  const progressPct = progress && progress.totalSpecies > 0
+    ? Math.round((progress.caught / progress.totalSpecies) * 100)
+    : 0;
+
   return (
-    <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
-      {routes.map((item) =>
-        item.kind === "single"
-          ? <RouteCard key={item.route.id} route={item.route} saveId={saveId} />
-          : (
-            <GroupedRouteCard
-              key={item.baseName}
-              baseName={item.baseName}
-              routes={item.routes}
-              saveId={saveId}
-            />
-          )
+    <Stack>
+      {progress && (
+        <Card>
+          <Stack>
+            <Group justify="space-between" mb={4}>
+              <Text fw={600} size="xl">
+                Overall Progress
+              </Text>
+              <Text size="sm" c="dimmed">
+                {progress.caught}/{progress.totalSpecies} caught
+              </Text>
+            </Group>
+            <Progress value={progressPct} color="blue" />
+          </Stack>
+        </Card>
       )}
-    </SimpleGrid>
+      <SimpleGrid cols={{ base: 2, md: 3, lg: 4 }}>
+        {routes.map((item) =>
+          item.kind === "single"
+            ? (
+              <RouteCard
+                key={item.route.id}
+                route={item.route}
+                saveId={saveId}
+              />
+            )
+            : (
+              <GroupedRouteCard
+                key={item.baseName}
+                baseName={item.baseName}
+                routes={item.routes}
+                saveId={saveId}
+              />
+            )
+        )}
+      </SimpleGrid>
+    </Stack>
   );
 }

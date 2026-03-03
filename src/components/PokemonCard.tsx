@@ -1,6 +1,6 @@
 import toggleCaught from "@/server/encounters/toggleCaught.ts";
 import getRouteEncounters from "@/server/routes/getRouteEncounters.ts";
-import { Box, Image, Text, Tooltip, UnstyledButton } from "@mantine/core";
+import { Box, Image, Text, UnstyledButton } from "@mantine/core";
 import { CheckCircle } from "@phosphor-icons/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -64,76 +64,75 @@ export default function PokemonCard({
   const sprite = entry.species.spriteUrl;
   const primaryMethod = entry.methods[0];
 
-  const tooltipContent = entry.methods
-    .map((m: EncounterEntry["methods"][number]) => {
-      const lvl = m.minLevel != null
-        ? m.minLevel === m.maxLevel
-          ? `Lv ${m.minLevel}`
-          : `Lv ${m.minLevel}–${m.maxLevel}`
-        : null;
-      const pct = m.chance != null ? `${m.chance}%` : null;
-      return [methodLabel(m.method), lvl, pct].filter(Boolean).join(" ");
-    })
-    .join(" · ");
+  function handleClick() {
+    if (!isPending) {
+      mutate();
+    }
+  }
 
   return (
-    <Tooltip label={tooltipContent} withArrow disabled={!tooltipContent}>
-      <UnstyledButton onClick={() => !isPending && mutate()} w="100%">
-        <Box
-          p="xs"
-          style={(theme) => ({
-            borderRadius: theme.radius.md,
-            border: `2px solid ${
-              caught ? theme.colors.green[6] : theme.colors.gray[3]
-            }`,
-            background: caught ? theme.colors.green[0] : theme.colors.gray[0],
-            opacity: caught ? 1 : 0.7,
-            transition: "all 0.15s ease",
-            position: "relative",
-            cursor: isPending ? "wait" : "pointer",
-            textAlign: "center",
-          })}
-        >
-          {caught && (
-            <Box
+    <UnstyledButton
+      onClick={handleClick}
+      w="100%"
+    >
+      <Box
+        p="xs"
+        style={(theme) => ({
+          borderRadius: theme.radius.md,
+          border: `2px solid ${
+            caught ? theme.colors.green[6] : theme.colors.gray[3]
+          }`,
+          background: caught ? theme.colors.green[0] : theme.colors.gray[0],
+          opacity: caught ? 1 : 0.7,
+          transition: "all 0.15s ease",
+          position: "relative",
+          cursor: isPending ? "wait" : "pointer",
+          textAlign: "center",
+        })}
+      >
+        {caught && (
+          <Box
+            style={{
+              position: "absolute",
+              top: 4,
+              right: 4,
+              color: "var(--mantine-color-green-6)",
+              lineHeight: 1,
+            }}
+          >
+            <CheckCircle size={16} weight="fill" />
+          </Box>
+        )}
+        {sprite
+          ? (
+            <Image
+              src={sprite}
+              alt={entry.species.name}
+              w={64}
+              h={64}
+              mx="auto"
               style={{
-                position: "absolute",
-                top: 4,
-                right: 4,
-                color: "var(--mantine-color-green-6)",
-                lineHeight: 1,
+                imageRendering: "pixelated",
+                filter: caught ? "none" : "brightness(0)",
+                transition: "filter 0.15s ease",
               }}
-            >
-              <CheckCircle size={16} weight="fill" />
-            </Box>
-          )}
-          {sprite
-            ? (
-              <Image
-                src={sprite}
-                alt={entry.species.name}
-                w={64}
-                h={64}
-                mx="auto"
-                style={{
-                  imageRendering: "pixelated",
-                  filter: caught ? "none" : "brightness(0)",
-                  transition: "filter 0.15s ease",
-                }}
-              />
-            )
-            : <Box w={64} h={64} mx="auto" />}
-          <Text size="xs" fw={caught ? 600 : 400} mt={2} truncate>
-            {entry.species.name}
-          </Text>
-          {primaryMethod && (
+            />
+          )
+          : <Box w={64} h={64} mx="auto" />}
+        <Text size="sm" c="black">
+          {entry.species.name}
+        </Text>
+        {primaryMethod && (
+          <>
             <Text size="xs" c="dimmed">
               {methodLabel(primaryMethod.method)}
+            </Text>
+            <Text size="xs" c="dimmed">
               {primaryMethod.chance != null ? ` ${primaryMethod.chance}%` : ""}
             </Text>
-          )}
-        </Box>
-      </UnstyledButton>
-    </Tooltip>
+          </>
+        )}
+      </Box>
+    </UnstyledButton>
   );
 }
