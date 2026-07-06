@@ -6,6 +6,7 @@
     "check": "deno fmt --check . && deno lint . && deno check",
     "test": "deno test --allow-read src/",
     "dev": "vite dev",
+    "prebuild": "deno run --env-file --env-file=.env.local -A prisma generate",
     "build": "vite build",
     "preview": "vite preview",
     "start": "deno -A ./.output/server/index.mjs",
