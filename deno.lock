@@ -1,12 +1,9 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@std/assert@*": "1.0.18",
-    "jsr:@std/assert@^1.0.19": "1.0.19",
-    "jsr:@std/dotenv@~0.225.6": "0.225.6",
-    "jsr:@std/internal@^1.0.12": "1.0.12",
-    "npm:zod@^4.3.6": "4.3.6",
     "npm:@deno/vite-plugin@^1.0.6": "1.0.6_vite@7.3.1__picomatch@4.0.3__jiti@2.6.1",
+    "npm:@jsr/std__assert@^1.0.19": "1.0.19",
+    "npm:@jsr/std__dotenv@~0.225.6": "0.225.7",
     "npm:@mantine/core@^8.3.15": "8.3.15_@mantine+hooks@8.3.15__react@19.2.4_react@19.2.4_react-dom@19.2.4__react@19.2.4_@types+react@19.2.14",
     "npm:@mantine/hooks@^8.3.15": "8.3.15_react@19.2.4",
     "npm:@mantine/modals@^8.3.15": "8.3.15_@mantine+core@8.3.15__@mantine+hooks@8.3.15___react@19.2.4__react@19.2.4__react-dom@19.2.4___react@19.2.4__@types+react@19.2.14_@mantine+hooks@8.3.15__react@19.2.4_react@19.2.4_react-dom@19.2.4__react@19.2.4_@types+react@19.2.14",
@@ -39,27 +36,10 @@
     "npm:react@^19.2.4": "19.2.4",
     "npm:srvx@~0.11.8": "0.11.8",
     "npm:url-template@^3.1.1": "3.1.1",
-    "npm:vite@^7.3.1": "7.3.1_picomatch@4.0.3_jiti@2.6.1"
+    "npm:vite@^7.3.1": "7.3.1_picomatch@4.0.3_jiti@2.6.1",
+    "npm:zod@^4.3.6": "4.3.6"
   },
   "jsr": {
-    "@std/assert@1.0.18": {
-      "integrity": "270245e9c2c13b446286de475131dc688ca9abcd94fc5db41d43a219b34d1c78",
-      "dependencies": [
-        "jsr:@std/internal"
-      ]
-    },
-    "@std/assert@1.0.19": {
-      "integrity": "eaada96ee120cb980bc47e040f82814d786fe8162ecc53c91d8df60b8755991e",
-      "dependencies": [
-        "jsr:@std/internal"
-      ]
-    },
-    "@std/dotenv@0.225.6": {
-      "integrity": "1d6f9db72f565bd26790fa034c26e45ecb260b5245417be76c2279e5734c421b"
-    },
-    "@std/internal@1.0.12": {
-      "integrity": "972a634fd5bc34b242024402972cd5143eac68d8dffaca5eaa4dba30ce17b027"
-    },
     "@zod/zod@4.3.6": {
       "integrity": "7144e5e11f8ffc3cf6e2fca624f6597a8762898aac9868cc8938e9398b96ffe4"
     }
@@ -512,6 +492,21 @@
         "@jridgewell/resolve-uri",
         "@jridgewell/sourcemap-codec"
       ]
+    },
+    "@jsr/std__assert@1.0.19": {
+      "integrity": "sha512-pEj6RPkGbqlgRmyKwATp4cUs6+ijxtdrv3bq8v1d2I2CEcMEyPaO8cVKro61wGRDH4cNg8Zx6haztvK/9m7gkA==",
+      "dependencies": [
+        "@jsr/std__internal"
+      ],
+      "tarball": "https://npm.jsr.io/~/11/@jsr/std__assert/1.0.19.tgz"
+    },
+    "@jsr/std__dotenv@0.225.7": {
+      "integrity": "sha512-Efy4o/d2nZWf6R/mPau5qxqIyW7CGH7NIkfwDpxcTEqyh+3C2niUTgC65LQGSStoFqo/LHQvXFnADAQZLE3p/Q==",
+      "tarball": "https://npm.jsr.io/~/11/@jsr/std__dotenv/0.225.7.tgz"
+    },
+    "@jsr/std__internal@1.0.14": {
+      "integrity": "sha512-JT8b/t40WcR9q0GDwRZUooY7aXeXnFal8iidE/5TckdAFtvpVAsaJ71/Xgf1SfoChs41s6CZkuCYM8toaNgdvA==",
+      "tarball": "https://npm.jsr.io/~/11/@jsr/std__internal/1.0.14.tgz"
     },
     "@mantine/core@8.3.15_@mantine+hooks@8.3.15__react@19.2.4_react@19.2.4_react-dom@19.2.4__react@19.2.4_@types+react@19.2.14": {
       "integrity": "sha512-wBn/GogB4x7a2Uj7Ztt3amRaApjED+9XqfE4wyCLh88R7KV55k9vnTdCx+irI/GLOOu9tXNUGm3a4t5sTajwkQ==",
@@ -1456,7 +1451,7 @@
         "@tanstack/router-core",
         "@tanstack/start-client-core",
         "@tanstack/start-storage-context",
-        "h3-v2@npm:h3@2.0.1-rc.14_crossws@0.4.4__srvx@0.10.1__srvx@0.11.8_srvx@0.11.8",
+        "h3-v2@npm:h3@2.0.1-rc.14_crossws@0.4.4__srvx@0.10.1_srvx@0.10.1",
         "seroval",
         "tiny-invariant"
       ]
@@ -1784,15 +1779,6 @@
         "srvx@0.10.1"
       ]
     },
-    "crossws@0.4.4_srvx@0.10.1_srvx@0.11.8": {
-      "integrity": "sha512-w6c4OdpRNnudVmcgr7brb/+/HmYjMQvYToO/oTrprTwxRUiom3LYWU1PMWuD006okbUWpII1Ea9/+kwpUfmyRg==",
-      "dependencies": [
-        "srvx@0.11.8"
-      ],
-      "optionalPeers": [
-        "srvx@0.11.8"
-      ]
-    },
     "css-select@5.2.2": {
       "integrity": "sha512-TizTzUddG/xYLA3NXodFM0fSbNizXjOKhqiQQwvhlspadZokn1KDy0NZFS0wuEubIYAV5/c1/lAr0TaaFXEXzw==",
       "dependencies": [
@@ -2043,27 +2029,15 @@
     "graphmatch@1.1.1": {
       "integrity": "sha512-5ykVn/EXM1hF0XCaWh05VbYvEiOL2lY1kBxZtaYsyvjp7cmWOU1XsAdfQBwClraEofXDT197lFbXOEVMHpvQOg=="
     },
-    "h3@2.0.1-rc.14_crossws@0.4.4__srvx@0.10.1__srvx@0.11.8_srvx@0.11.8": {
-      "integrity": "sha512-163qbGmTr/9rqQRNuqMqtgXnOUAkE4KTdauiC9y0E5iG1I65kte9NyfWvZw5RTDMt6eY+DtyoNzrQ9wA2BfvGQ==",
-      "dependencies": [
-        "crossws@0.4.4_srvx@0.10.1_srvx@0.11.8",
-        "rou3",
-        "srvx@0.11.8"
-      ],
-      "optionalPeers": [
-        "crossws@0.4.4_srvx@0.10.1_srvx@0.11.8"
-      ],
-      "bin": true
-    },
     "h3@2.0.1-rc.14_crossws@0.4.4__srvx@0.10.1_srvx@0.10.1": {
       "integrity": "sha512-163qbGmTr/9rqQRNuqMqtgXnOUAkE4KTdauiC9y0E5iG1I65kte9NyfWvZw5RTDMt6eY+DtyoNzrQ9wA2BfvGQ==",
       "dependencies": [
-        "crossws@0.4.4_srvx@0.10.1",
+        "crossws",
         "rou3",
         "srvx@0.11.8"
       ],
       "optionalPeers": [
-        "crossws@0.4.4_srvx@0.10.1"
+        "crossws"
       ],
       "bin": true
     },
@@ -2218,9 +2192,9 @@
       "integrity": "sha512-YviDY5J/trS821qQ1fpJtpXWIdPYiOizC/meHavlm1Hfuhx//H+Egd1+4C5SegJRgtWMnRPW9n//6Woaw81cTQ==",
       "dependencies": [
         "consola",
-        "crossws@0.4.4_srvx@0.10.1",
+        "crossws",
         "db0",
-        "h3@2.0.1-rc.14_crossws@0.4.4__srvx@0.10.1_srvx@0.10.1",
+        "h3",
         "jiti",
         "nf3",
         "ofetch",
@@ -2994,44 +2968,46 @@
     }
   },
   "workspace": {
-    "dependencies": [
-      "jsr:@std/assert@^1.0.19",
-      "jsr:@std/dotenv@~0.225.6",
-      "npm:zod@^4.3.6",
-      "npm:@deno/vite-plugin@^1.0.6",
-      "npm:@mantine/core@^8.3.15",
-      "npm:@mantine/hooks@^8.3.15",
-      "npm:@mantine/modals@^8.3.15",
-      "npm:@mantine/notifications@^8.3.15",
-      "npm:@phosphor-icons/react@^2.1.10",
-      "npm:@prisma/adapter-pg@^7.4.1",
-      "npm:@prisma/client@^7.4.1",
-      "npm:@tanstack/devtools-vite@~0.5.1",
-      "npm:@tanstack/react-devtools@~0.9.6",
-      "npm:@tanstack/react-form-devtools@~0.2.16",
-      "npm:@tanstack/react-form-start@^1.28.3",
-      "npm:@tanstack/react-query-devtools@^5.91.3",
-      "npm:@tanstack/react-query@^5.90.21",
-      "npm:@tanstack/react-router-devtools@^1.163.2",
-      "npm:@tanstack/react-router@^1.163.2",
-      "npm:@tanstack/react-start@^1.163.2",
-      "npm:@types/pg@^8.16.0",
-      "npm:@types/react-dom@^19.2.3",
-      "npm:@types/react@^19.2.14",
-      "npm:@vitejs/plugin-react@^5.1.4",
-      "npm:better-auth@^1.4.19",
-      "npm:nitro@^3.0.1-alpha.2",
-      "npm:pg@^8.19.0",
-      "npm:postcss-preset-mantine@^1.18.0",
-      "npm:postcss-simple-vars@^7.0.1",
-      "npm:postcss@^8.5.6",
-      "npm:prisma@^7.4.1",
-      "npm:react-dom@^19.2.4",
-      "npm:react-error-boundary@^6.1.1",
-      "npm:react@^19.2.4",
-      "npm:srvx@~0.11.8",
-      "npm:url-template@^3.1.1",
-      "npm:vite@^7.3.1"
-    ]
+    "packageJson": {
+      "dependencies": [
+        "npm:@deno/vite-plugin@^1.0.6",
+        "npm:@jsr/std__assert@^1.0.19",
+        "npm:@jsr/std__dotenv@~0.225.6",
+        "npm:@mantine/core@^8.3.15",
+        "npm:@mantine/hooks@^8.3.15",
+        "npm:@mantine/modals@^8.3.15",
+        "npm:@mantine/notifications@^8.3.15",
+        "npm:@phosphor-icons/react@^2.1.10",
+        "npm:@prisma/adapter-pg@^7.4.1",
+        "npm:@prisma/client@^7.4.1",
+        "npm:@tanstack/devtools-vite@~0.5.1",
+        "npm:@tanstack/react-devtools@~0.9.6",
+        "npm:@tanstack/react-form-devtools@~0.2.16",
+        "npm:@tanstack/react-form-start@^1.28.3",
+        "npm:@tanstack/react-query-devtools@^5.91.3",
+        "npm:@tanstack/react-query@^5.90.21",
+        "npm:@tanstack/react-router-devtools@^1.163.2",
+        "npm:@tanstack/react-router@^1.163.2",
+        "npm:@tanstack/react-start@^1.163.2",
+        "npm:@types/pg@^8.16.0",
+        "npm:@types/react-dom@^19.2.3",
+        "npm:@types/react@^19.2.14",
+        "npm:@vitejs/plugin-react@^5.1.4",
+        "npm:better-auth@^1.4.19",
+        "npm:nitro@^3.0.1-alpha.2",
+        "npm:pg@^8.19.0",
+        "npm:postcss-preset-mantine@^1.18.0",
+        "npm:postcss-simple-vars@^7.0.1",
+        "npm:postcss@^8.5.6",
+        "npm:prisma@^7.4.1",
+        "npm:react-dom@^19.2.4",
+        "npm:react-error-boundary@^6.1.1",
+        "npm:react@^19.2.4",
+        "npm:srvx@~0.11.8",
+        "npm:url-template@^3.1.1",
+        "npm:vite@^7.3.1",
+        "npm:zod@^4.3.6"
+      ]
+    }
   }
 }
