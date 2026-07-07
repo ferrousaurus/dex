@@ -1,7 +1,7 @@
 // Seed script for Pokémon Route Tracker
 // Fetches species and encounter data live from PokeAPI
-import { PrismaClient } from "./generated/client.ts";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "./generated/client.ts";
 
 const DATABASE_URL = Deno.env.get("DATABASE_URL") ??
   "postgresql://postgres:password@localhost:5432/dex";
